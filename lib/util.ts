@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     email: String,
     password: String,
     dob: Date
-});
+}); 
 
 export const User = mongoose.models.User || mongoose.model('User', userSchema);
 

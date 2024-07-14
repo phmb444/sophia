@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useState } from "react";
 import { getUserData } from "./actions";
-import { Date } from "mongoose";
+import { Button } from "@nextui-org/react";
 
 export default function User() {
   type UserData = {
@@ -37,7 +37,10 @@ export default function User() {
     <>
       <div className="text-5xl mt-4 font-bold">{userData?.name}</div>
       <div className="text-3xl ml-1 mt-4">{userData?.email}</div>
-      <button className="button mt-4">Alterar Senha</button>
+      <div className="mt-4">
+      <Button className="mr-4">Alterar senha</Button>
+      <Button>Alterar email</Button>
+      </div>
     </>
   );
 }
