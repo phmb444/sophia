@@ -3,6 +3,8 @@
 import { loginUser } from "./actions";
 import { FormEvent } from "react";
 import { useState } from "react";
+import { Input } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 import InfoSection from "@/components/information_section";
 
 export default function Login() {
@@ -27,23 +29,31 @@ export default function Login() {
         <h1 className="text-3xl font-bold">Bem vindo de volta</h1>
         <h2 className="text-lg font-semibold">Insira seus dados abaixo </h2>
         <form onSubmit={handleSubmit} className="flex flex-col p-4">
-          <label className="font-bold" htmlFor="email">
-            email
-          </label>
-          <input type="email" id="email" name="email" className="input_text" />
-          <label className="font-bold mt-2  " htmlFor="password">
-            Password
-          </label>
-          <input
+          <Input
+            type="email"
+            className="mt-6"
+            id="email"
+            name="email"
+            placeholder="Enter your email"
+          />
+          <Input
+            className="mt-4"
             type="password"
             id="password"
             name="password"
-            className="input_text"
+            placeholder="Enter your password"
+            
           />
-          <button type="submit" className="md:w-80 w-60 button mt-6">
+          <Button
+            type="submit"
+            className="md:w-80 w-60 mt-8 bg-zinc-900 text-zinc-100"
+            size="lg"
+          >
             Login
-          </button>
-          {error && <div className="text-red-600 font-semibold mt-2">{error}</div>}
+          </Button>
+          {error && (
+            <div className="text-red-600 font-semibold mt-2">{error}</div>
+          )}
         </form>
       </main>
       <InfoSection />
