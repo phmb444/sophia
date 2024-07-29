@@ -1,6 +1,5 @@
 "use client";
 
-import { loginUser } from "./actions";
 import { FormEvent } from "react";
 import { useState } from "react";
 import { Input } from "@nextui-org/react";
@@ -14,7 +13,11 @@ export default function Login() {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
-    const result = await loginUser(formData);
+    const result = await fetch("/api/login", {
+      method: "POST",
+      body: formData,
+    }).then((response) => response.json());
+    
     if (typeof result === "string") {
       setError(result);
     } else {
@@ -42,7 +45,6 @@ export default function Login() {
             id="password"
             name="password"
             placeholder="Enter your password"
-            
           />
           <Button
             type="submit"
