@@ -1,7 +1,8 @@
-import { User } from '@/lib/util';
-import { connectToMongoDB } from '@/lib/util';
 import { generateJWT } from '@/lib/util';
 import { decrypt } from '@/lib/util';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 
 export async function POST (request : Request){
@@ -21,8 +22,11 @@ async function loginUser(formData: FormData) {
         console.error('Invalid form data');
         return "Preencha todos os campos corretamente";
     }
-    await connectToMongoDB();
-    const user = await User.findOne({ email: email });
+    const user = await prisma.users.findUnique({
+        where: {
+            email
+        }
+    });
     if (!user) {
         console.error('User not found');
         return "Usuário não existente";
@@ -38,6 +42,6 @@ async function loginUser(formData: FormData) {
         console.error('JWT_SECRET is not defined');
         return "Erro interno";
     }
-    const jwtToken = await generateJWT(user._id, secret);
+    const jwtToken = await generateJWT(user.id, secret);
     return {token: jwtToken, message: "Sucesso ao realizar login"};
 }
