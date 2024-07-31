@@ -11,7 +11,7 @@
 }
 
 .button {
-  @apply bg-zinc-900 text-zinc-100 transition-all font-semibold py-2 px-4 rounded-lg h-fit text-center hover;
+  @apply bg-zinc-900 text-zinc-100 transition-all ;
 }
 
 .button_secondary {
@@ -56,6 +56,13 @@
   box-shadow: 2px 0px 15px 0px rgba(0, 0, 0, 0.25);
 }
 
+.box-4 {
+  @apply text-zinc-900;
+  border-radius: 30px;
+  box-shadow: 2px 0px 15px 0px rgba(0, 0, 0, 0.25);
+  
+}
+
 .box-1 {
   @apply box;
   background: linear-gradient(128deg, #e6d604 -3.28%, #b45c0b 98.55%);
@@ -72,6 +79,15 @@
     220deg,
     #ff81cd 9.06%,
     #d53757 73.27%,
+    #b50000 108%
+  );
+}
+
+.gradient-divider{
+  background: linear-gradient(
+    220deg,
+    #e6d604,
+    #ff81cd 9.06%,
     #b50000 108%
   );
 }
