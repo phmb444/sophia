@@ -11,7 +11,7 @@ model users {
   id       String   @id @map("_id")
   v        Int      @map("__v")
   dob      DateTime @db.Date
-  email    String   @unique
+  email    String   @unique @map("email")
   name     String
   password String
 }

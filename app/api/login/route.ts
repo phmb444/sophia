@@ -24,7 +24,7 @@ async function loginUser(formData: FormData) {
     }
     const user = await prisma.users.findUnique({
         where: {
-            email
+            email: email
         }
     });
     if (!user) {
