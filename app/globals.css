@@ -73,6 +73,11 @@
   background: linear-gradient(179deg, #c6a4f5 -4.36%, #4d2c4e 111.92%);
 }
 
+.btn-gradient{
+  background: linear-gradient(70deg, #c6a4f5 -4.36%, #4d2c4e 111.92%);
+  @apply text-zinc-100
+}
+
 .box-3 {
   @apply box;
   background: linear-gradient(
