@@ -5,16 +5,48 @@ import { Divider } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/react";
 import { FormEvent } from "react";
+import { useState } from "react";
 
 
 export default function Exercises() {
+  const [tema, setTema] = useState("");
+  const [quantidade, setQuantidade] = useState("");
+  const [nivel, setNivel] = useState("");
+  const [tipos, setTipos] = useState(["Alternativas"]);
+  const [files, setFiles] = useState<FileList | null>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = event.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
+
+  function handleSubmit() {
+    const data = {
+      tema,
+      quantidade,
+      nivel,
+      tipos,
+      files,
+    };
     console.log(data);
+  }
+
+  const [fileError, setFileError] = useState("");
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (files) {
+      let isValid = true;
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].type !== "application/pdf") {
+          isValid = false;
+          break;
+        }
+      }
+      if (isValid) {
+        setFiles(files);
+        setFileError("");
+      } else {
+        setFiles(null);
+        setFileError("Only PDF files are allowed.");
+      }
+    }
   }
 
   return (
@@ -23,12 +55,14 @@ export default function Exercises() {
       <main className="md:w-[45vw] min-h-fit box-4 px-16 py-14 mb-12">
         <h1 className="text-4xl font-semibold">Nova lista de exercícios</h1>
         <Divider className="my-4 gradient-divider"></Divider>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           <Input
             type="text"
             id="tema"
             name="tema"
             label="Tema:"
+            value={tema}
+            onValueChange={setTema}
             isRequired
             labelPlacement="outside"
             variant="bordered"
@@ -38,6 +72,8 @@ export default function Exercises() {
             type="number"
             id="quantidade"
             name="quantidade"
+            value={quantidade}
+            onValueChange={setQuantidade}
             label="Quantidade de questões:"
             isRequired
             labelPlacement="outside"
@@ -48,6 +84,8 @@ export default function Exercises() {
             type="text"
             id="nivel"
             name="nivel"
+            value={nivel}
+            onValueChange={setNivel}
             label="Nível de escolaridade"
             isRequired
             labelPlacement="outside"
@@ -58,6 +96,8 @@ export default function Exercises() {
             label="Tipos das questões"
             orientation="horizontal"
             isRequired
+            value={tipos}
+            onValueChange={setTipos}
             color="primary"
             defaultValue={["Alternativas"]}
           >
@@ -79,10 +119,30 @@ export default function Exercises() {
                 clique para selecionar
               </span>
             </p>
-            <input id="file-upload" type="file" className="hidden" multiple />
+            <input
+              id="file-upload"
+              type="file"
+              className="hidden"
+              multiple
+              accept=".pdf"
+              onChange={handleFileChange}
+            />
           </label>
-          <Button type="submit" className="btn-gradient mt-6">Gerar exercícios</Button>
-        </form>
+          {fileError && <p className="text-red-500">{fileError}</p>}
+          {files && (
+            <div>
+              <h3>Arquivos enviados:</h3>
+              <ul>
+                {Array.from(files).map((file, index) => (
+                  <li key={index}>{file.name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <Button onClick={handleSubmit} className="btn-gradient mt-6">
+            Gerar exercícios
+          </Button>
+        </div>
       </main>
     </div>
   );
