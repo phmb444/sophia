@@ -4,8 +4,8 @@ import { Button } from "@nextui-org/react";
 import { Divider } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/react";
-import { FormEvent } from "react";
 import { useState } from "react";
+import { DataFromUser } from "@/app/api/exercises/route";
 
 
 export default function Exercises() {
@@ -13,18 +13,25 @@ export default function Exercises() {
   const [quantidade, setQuantidade] = useState("");
   const [nivel, setNivel] = useState("");
   const [tipos, setTipos] = useState(["Alternativas"]);
-  const [files, setFiles] = useState<FileList | null>(null);
+  const [files, setFiles] = useState<FileList | null>(null);  
 
 
-  function handleSubmit() {
-    const data = {
+  async function handleSubmit() {
+    const data: DataFromUser = {
       tema,
       quantidade,
       nivel,
       tipos,
-      files,
     };
-    console.log(data);
+    let test = await fetch ('/api/exercises', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    let response = await test.json();
+    console.log(response);
   }
 
   const [fileError, setFileError] = useState("");
