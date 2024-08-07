@@ -39,7 +39,7 @@ async function loginUser(formData: FormData) {
     const secret = String(process.env.SECRET);
     console.log(secret)
     if (!secret) {
-        console.error('JWT_SECRET is not defined');
+        console.error('SECRET is not defined');
         return "Erro interno";
     }
     const jwtToken = await generateJWT(user.id, secret);

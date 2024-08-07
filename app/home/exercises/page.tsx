@@ -9,6 +9,7 @@ import { DataFromUser } from "@/app/api/exercises/route";
 
 
 export default function Exercises() {
+  let token = localStorage.getItem("sophia_token");
   const [tema, setTema] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [nivel, setNivel] = useState("");
@@ -27,6 +28,7 @@ export default function Exercises() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Token': token as string,
       },
       body: JSON.stringify(data),
     });
