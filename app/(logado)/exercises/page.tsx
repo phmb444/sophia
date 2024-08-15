@@ -4,21 +4,32 @@ import { Button } from "@nextui-org/react";
 import { Divider } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/react";
-import { useState } from "react";
-import { DataFromUser } from "@/app/api/exercises/route";
+import { useState,useEffect } from "react";
+
 
 
 export default function Exercises() {
-  let token = localStorage.getItem("sophia_token");
+
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [tema, setTema] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [nivel, setNivel] = useState("");
   const [tipos, setTipos] = useState(["Alternativas"]);
   const [files, setFiles] = useState<FileList | null>(null);  
 
+  useEffect(() => {
+    const token = localStorage.getItem("sophia_token");
+    if (!token) {
+      window.location.href = "/";
+    }
+    setToken(token);
+  }, []);
+
 
   async function handleSubmit() {
-    const data: DataFromUser = {
+    setLoading(true);
+    const data = {
       tema,
       quantidade,
       nivel,
@@ -33,7 +44,7 @@ export default function Exercises() {
       body: JSON.stringify(data),
     });
     let response = await test.json();
-    console.log(response);
+    window.location.href = `/exercises/${response.id}`;
   }
 
   const [fileError, setFileError] = useState("");
@@ -148,9 +159,10 @@ export default function Exercises() {
               </ul>
             </div>
           )}
-          <Button onClick={handleSubmit} className="btn-gradient mt-6">
+          <Button isLoading={loading} onClick={handleSubmit} className="btn-gradient mt-6">
             Gerar exercícios
           </Button>
+          
         </div>
       </main>
     </div>

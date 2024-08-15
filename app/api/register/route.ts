@@ -2,14 +2,14 @@ import bcrypt from 'bcrypt';
 import { redirect } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaClient } from '@prisma/client';
+import { generateJWT } from '@/lib/util';
 
 const prisma = new PrismaClient();
 
 export async function POST (request : Request){
     const formData = await request.formData();
     const result = await registerUser(formData);
-    const res = {message: result};
-    return new Response(JSON.stringify(res));
+    return new Response(JSON.stringify(result));
 }
 
 async function encrypt(password: string, salts: number): Promise<string> {
@@ -23,7 +23,7 @@ async function registerUser(formData: FormData) {
     const dob = formData.get('dob');
     if (!name || !email || !password || !dob) {
         console.error('Invalid form data');
-        return "Preencha todos os campos corretamente";
+        return {msg: 'Por favor, preencha todos os campos'};
     }
     const salts = 5;
     const encryptedPassword = await encrypt(password, salts);
@@ -33,7 +33,7 @@ async function registerUser(formData: FormData) {
         }
     });
     if (existingUser) {
-        return "Usuário com este email já existe";
+        return {msg: 'Usuário já registrado'};
     }
     const uuid = uuidv4();
     // const user = new User({_id: uuid, name, email, password: encryptedPassword, dob});
@@ -47,7 +47,14 @@ async function registerUser(formData: FormData) {
             v: 0
         }
     });
+    const secret = String(process.env.SECRET);
+    console.log(secret)
+    if (!secret) {
+        console.error('SECRET is not defined');
+        return {msg: 'Erro interno do servidor'};
+    }
+    const jwtToken = await generateJWT(user.id, secret);
     console.log(user);
     console.log('User registered successfully');
-    return "Usuário registrado com sucesso";
+    return {token: jwtToken, msg: 'Usuário registrado com sucesso'};
 }

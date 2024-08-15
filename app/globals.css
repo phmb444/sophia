@@ -96,3 +96,10 @@
     #b50000 108%
   );
 }
+.option{
+  transition: all ease 0.2s;
+}
+
+.option:hover {
+  @apply bg-zinc-300 text-zinc-900;
+}

@@ -4,6 +4,7 @@ import { FormEvent } from "react";
 import { useState } from "react";
 import InfoSection from "@/components/information_section";
 import { set } from "mongoose";
+import { Button } from "@nextui-org/react";
 
 export default function Register() {
   const [error, setError] = useState<string | null>(null);
@@ -18,10 +19,11 @@ export default function Register() {
     });
     const data = await result.json();
     console.log(data);
-    if (data.message === "Usuário registrado com sucesso") {
-      window.location.href = "/login";
+    if (data.msg === "Usuário registrado com sucesso") {
+      localStorage.setItem("sophia_token", data.token);
+      window.location.href = "/home";
     } else {
-      setError(data.message);
+      setError(data.msg);
     }
   }
 
@@ -62,9 +64,9 @@ export default function Register() {
             Data de nascimento
           </label>
           <input type="date" id="dob" name="dob" className="input_text w-80" />
-          <button type="submit" className="button mt-6">
+          <Button type="submit" className="button mt-6">
             Registrar-se
-          </button>
+          </Button>
         </form>
         {error && (
           <div className="text-red-600 font-semibold mt-2">{error}</div>
