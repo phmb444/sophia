@@ -26,7 +26,6 @@ export default function ExerciseView({ params }: { params: { id: string } }) {
         });
         const data = await response.json();
         setExercise(data);
-        console.log(data);
       };
       getExercise();
     },[id]);
@@ -48,7 +47,7 @@ export default function ExerciseView({ params }: { params: { id: string } }) {
         ""
       )}
       {exercise ? (
-        <Chip color="warning" className="mb-4 md:max-w-[60vw]">
+        <Chip color="warning" className="mb-4 text-white md:max-w-[60vw]">
         Quantidade: {exercise.params.quantidade}
         </Chip>
       ) : (
@@ -58,7 +57,7 @@ export default function ExerciseView({ params }: { params: { id: string } }) {
       {exercise ? (
         <QuestionHolder questoes={exercise.content.questions} />
       ) : (
-        "Loading..."
+        "Carregando..."
       )}
       </main>
     );

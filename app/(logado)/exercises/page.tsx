@@ -5,6 +5,7 @@ import { Divider } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/react";
 import { useState,useEffect } from "react";
+import ExercisesHistory from "@/components/exercises_history_modal";
 
 
 
@@ -71,7 +72,7 @@ export default function Exercises() {
 
   return (
     <div className="overflow-x-hidden relative w-full flex flex-col items-center">
-      <Button className="mb-4 button">Mostrar exercicios anteriores</Button>
+      <ExercisesHistory></ExercisesHistory>
       <main className="md:w-[45vw] min-h-fit box-4 px-16 py-14 mb-12">
         <h1 className="text-4xl font-semibold">Nova lista de exercícios</h1>
         <Divider className="my-4 gradient-divider"></Divider>

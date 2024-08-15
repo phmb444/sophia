@@ -8,8 +8,10 @@ import { Button } from "@nextui-org/react";
 
 export default function Register() {
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    setLoading(true);
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
@@ -18,18 +20,19 @@ export default function Register() {
       body: formData,
     });
     const data = await result.json();
-    console.log(data);
     if (data.msg === "Usuário registrado com sucesso") {
       localStorage.setItem("sophia_token", data.token);
       window.location.href = "/home";
     } else {
       setError(data.msg);
+      setLoading(false);
     }
   }
 
   return (
     <div className="flex w-screen">
-      <main className="w-1/2 h-screen flex flex-col items-center justify-center fundo_login">
+      <main className="w-full h-screen flex flex-col items-center justify-center fundo_login">
+        <a href="/"><img src="/logo_novo_branco.png" alt="" width={250} className="mb-12" /></a>
         <h1 className="text-3xl font-bold">Bem vindo de volta</h1>
         <h2 className="text-lg font-semibold">Insira seus dados abaixo </h2>
         <form onSubmit={handleSubmit} className="flex flex-col p-4">
@@ -64,7 +67,7 @@ export default function Register() {
             Data de nascimento
           </label>
           <input type="date" id="dob" name="dob" className="input_text w-80" />
-          <Button type="submit" className="button mt-6">
+          <Button isLoading={loading} type="submit" className="button mt-6">
             Registrar-se
           </Button>
         </form>
@@ -72,7 +75,6 @@ export default function Register() {
           <div className="text-red-600 font-semibold mt-2">{error}</div>
         )}
       </main>
-      <InfoSection />
     </div>
   );
 }

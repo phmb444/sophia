@@ -20,7 +20,7 @@ async function loginUser(formData: FormData) {
     const email = formData.get('email')?.toString?.();
     const password = formData.get('password')?.toString?.();
     if (!email || !password) {
-        console.error('Invalid form data');
+
         return "Preencha todos os campos corretamente";
     }
     const user = await prisma.users.findUnique({
@@ -29,18 +29,18 @@ async function loginUser(formData: FormData) {
         }
     });
     if (!user) {
-        console.error('User not found');
+
         return "Usuário não existente";
     }
     const result = await decrypt(password, user.password);
     if (!result) {
-        console.error('Invalid password');
+
         return "Senha inválida";
     }
     const secret = String(process.env.SECRET);
-    console.log(secret)
+
     if (!secret) {
-        console.error('SECRET is not defined');
+
         return "Erro interno";
     }
     const jwtToken = await generateJWT(user.id, secret);

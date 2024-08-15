@@ -10,6 +10,7 @@ import InfoSection from "@/components/information_section";
 export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("sophia_token");
@@ -20,6 +21,7 @@ export default function Login() {
 
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    setLoading(true);
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
@@ -29,6 +31,7 @@ export default function Login() {
     }).then((response) => response.json());
     
     if (typeof result === "string") {
+      setLoading(false);
       setError(result);
     } else {
       localStorage.setItem("sophia_token", result.token);
@@ -58,6 +61,7 @@ export default function Login() {
             placeholder="Insira sua senha"
           />
           <Button
+            isLoading = {loading}
             type="submit"
             className="md:w-80 w-60 mt-8 bg-zinc-900 text-zinc-100"
             size="lg"

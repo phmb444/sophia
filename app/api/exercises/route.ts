@@ -52,7 +52,6 @@ export async function POST(request: Request) {
   let parsedContent;
   if (content) {
     parsedContent = JSON.parse(content);
-    console.log(parsedContent);
   }
   const uuid = uuidv4();
 

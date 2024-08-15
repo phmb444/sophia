@@ -22,7 +22,6 @@ async function registerUser(formData: FormData) {
     const password = formData.get('password')?.toString?.();
     const dob = formData.get('dob');
     if (!name || !email || !password || !dob) {
-        console.error('Invalid form data');
         return {msg: 'Por favor, preencha todos os campos'};
     }
     const salts = 5;
@@ -48,13 +47,13 @@ async function registerUser(formData: FormData) {
         }
     });
     const secret = String(process.env.SECRET);
-    console.log(secret)
+
     if (!secret) {
-        console.error('SECRET is not defined');
+
         return {msg: 'Erro interno do servidor'};
     }
     const jwtToken = await generateJWT(user.id, secret);
-    console.log(user);
-    console.log('User registered successfully');
+
+
     return {token: jwtToken, msg: 'Usuário registrado com sucesso'};
 }
