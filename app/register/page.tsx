@@ -33,7 +33,7 @@ export default function Register() {
     <div className="flex w-screen">
       <main className="w-full h-screen flex flex-col items-center justify-center fundo_login">
         <a href="/"><img src="/logo_novo_branco.png" alt="" width={250} className="mb-12" /></a>
-        <h1 className="text-3xl font-bold">Bem vindo de volta</h1>
+        <h1 className="text-3xl font-bold">Bem vindo</h1>
         <h2 className="text-lg font-semibold">Insira seus dados abaixo </h2>
         <form onSubmit={handleSubmit} className="flex flex-col p-4">
           <label htmlFor="name" className="font-bold">
