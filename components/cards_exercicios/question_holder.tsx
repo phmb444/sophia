@@ -9,9 +9,9 @@ export default function QuestionHolder(questoes: any) {
             {questoes.questoes.map((questao: any, index:number) => (
                 <div key={index}>
                 {questao.type.toLowerCase() === "alternativa" ? (
-                    <QuestaoAlternativa questao = {questao} />
+                    <QuestaoAlternativa questao = {questao} index={index} />
                 ) : (
-                    <QuestaoDissertativa questao = {questao} />
+                    <QuestaoDissertativa questao = {questao} index={index} />
                 )}
                 </div>
             ))}

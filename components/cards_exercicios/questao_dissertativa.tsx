@@ -10,7 +10,7 @@ import {
 import { use, useState } from "react";
 
 
-export default function QuestaoDissertativa({ questao }: any) {
+export default function QuestaoDissertativa({ questao, index }: any) {
     const [acertou, setAcertou] = useState(false);
     const [esperandoResposta, setEsperandoResposta] = useState(false);
     const [nota, setNota] = useState(0);
@@ -37,7 +37,7 @@ export default function QuestaoDissertativa({ questao }: any) {
 
     return (
         <Card className="mb-4">
-            <CardHeader className="font-bold">{questao.question}</CardHeader>
+            <CardHeader className="font-bold">{index + 1}) {questao.question}</CardHeader>
             <CardBody>
                 <Divider className="mb-4" />
                 <Textarea

@@ -10,7 +10,8 @@ import {
 } from "@nextui-org/react";
 import { useState } from "react";
 
-export default function QuestaoAlternativa({ questao }: any) {
+export default function QuestaoAlternativa({ questao, index }: any) {
+    console.log(questao);
     const [acertou, setAcertou] = useState(false);
     const [mensagem, setMensagem] = useState("");
 
@@ -29,7 +30,7 @@ export default function QuestaoAlternativa({ questao }: any) {
     return (
         <>
             <Card className="mb-4">
-                <CardHeader className="font-bold">{questao.question}</CardHeader>
+                <CardHeader className="font-bold">{index + 1}) {questao.question}</CardHeader>
                 <CardBody>
                     <Divider />
                     <ul className="flex flex-col w-full mt-4 justify-between space-y-4">

@@ -14,6 +14,7 @@ export default function Home() {
       window.location.href = "/";
     }
     setToken(token);
+    console.log(token);
   }, []);
   return (
     <div className="lg:h-[85vh] h-fit pb-8">
