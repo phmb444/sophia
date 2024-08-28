@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       },
     ],
     temperature: 1,
-    max_tokens: 16383,
+    max_tokens: 16384,
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,
