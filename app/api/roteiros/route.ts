@@ -10,6 +10,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// criar roteiro
 export async function POST(request: Request) {
   const parameters = await request.json();
   const token = request.headers.get("Token");
@@ -67,4 +68,29 @@ export async function POST(request: Request) {
   return new Response(JSON.stringify({ id: savedContent.id }))
   
   
+}
+
+// histórico de roteiros
+export async function GET(request: Request) {
+  const token = request.headers.get("Token");
+  if (!token) {
+    return new Response("Token não encontrado");
+  }
+  const secret = process.env.SECRET;
+  if (!secret) {
+    return new Response("Erro interno do servidor");
+  }
+  let id;
+  let decoded = await verifyJWT(token, secret);
+  if (typeof decoded === "object") {
+    id = decoded.id;
+  }
+
+  const roteiros = await prisma.roteiros.findMany({
+    where: {
+      authorId: id,
+    },
+  });
+
+  return new Response(JSON.stringify(roteiros));
 }

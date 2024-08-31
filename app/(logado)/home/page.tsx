@@ -106,7 +106,7 @@ export default function Home() {
           <div className="flex flex-col justify-between h-full w-4/5">
             <p className="text-3xl font-bold">Crie roteiros de estudos</p>
             <p className="text-xl font-semibold">
-              Em desenvolvimento
+              Para estudar para provas, vestibulares, concursos ou sobre um assunto de seu interesse.
             </p>
           </div>
           <div className="w-1/5 h-full flex flex-col justify-between items-center">
@@ -133,7 +133,7 @@ export default function Home() {
                 </HoverCard.Content>
               </HoverCard.Portal>
             </HoverCard.Root>
-            {/*<img src="arrow.png" alt="" className="absolute bottom-6 right-6 hover:scale-110 hover:cursor-pointer transition-all"/>*/}
+            <a href="/roteiros"><img src="arrow.png" alt="" className="absolute bottom-6 right-6 hover:scale-110 hover:cursor-pointer transition-all"/></a>
           </div>
         </div>
       </section>

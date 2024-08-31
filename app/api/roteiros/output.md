@@ -1,41 +1,116 @@
-# Roteiro de Estudo: Introdução ao JavaScript 
+# Roteiro de Estudo: Programação Orientada a Objetos (POO) em Java
 
-Se você já tem experiência com Python, isso vai ajudar muito na sua jornada de aprendizado em JavaScript! Este roteiro irá guiá-lo pelos primeiros passos na programação com JavaScript, explorando os conceitos fundamentais e fornecendo recursos úteis para estudo.
+## Introdução à POO
+A Programação Orientada a Objetos é um paradigma de programação que utiliza "objetos" para modelar dados e comportamentos. Em Java, a POO permite a construção de programas mais modularizados e reutilizáveis.
 
-## 1. O que é JavaScript?
-   - Breve história e evolução do JavaScript.
-   - Principais casos de uso: desenvolvimento web, servidores (com Node.js), aplicativos móveis, etc.
+## Principais Conceitos de POO
 
-## 2. Configurando seu ambiente
-   - **Navegadores Web**: Como usar o console do desenvolvedor (F12 ou Ctrl + Shift + I).
-   - **Editores de Código**: Sugestões de editores como Visual Studio Code, Sublime Text, ou Atom.
-   - **Instalação do Node.js** (opcional): Para rodar JavaScript fora do navegador.
+### 1. Classes e Objetos
+- **Classe**: Um modelo ou um blueprint a partir do qual objetos são criados.
+- **Objeto**: Uma instância de uma classe.
 
-## 3. Sintaxe Básica do JavaScript
-   - Variáveis: `let`, `const`, `var`.
-   - Tipos de dados: String, Number, Boolean, Object, Array.
-   - Estruturas de controle: `if`, `else`, `switch`, `for`, `while`.
-   - Funções: Declaração, Expressão de função, Arrow Functions.
+**Exemplo:**
+```java
+class Carro {
+    String modelo;
+    String cor;
+    
+    void acelerar() {
+        System.out.println("O carro está acelerando.");
+    }
+}
 
-## 4. Manipulação do DOM (Document Object Model)
-   - O que é o DOM? 
-   - Selecionando elementos: `document.getElementById()`, `document.querySelector()`.
-   - Modificando elementos: Alterando texto, estilos e atributos.
-   - Eventos: Como adicionar ouvintes de eventos.
+Carro meuCarro = new Carro();
+meuCarro.modelo = "Fusca";
+meuCarro.cor = "azul";
+meuCarro.acelerar();
+```
 
-## 5. Introdução a Programação Assíncrona
-   - O que é programação assíncrona?
-   - Introdução às Promessas (Promises) e o uso da palavra-chave `async/await`.
+### 2. Encapsulamento
+- O encapsulamento envolve ocultar os detalhes internos de uma classe e proteger os dados. Isso é realizado através do uso de modificadores de acesso.
 
-## 6. Praticando com Exercícios
-   - Criar um pequeno projeto, como uma To-Do List ou um jogo simples.
-   - Exemplos práticos que reforçam as lições aprendidas.
+**Exemplo:**
+```java
+class ContaBancaria {
+    private double saldo;
 
-## Recursos para Estudo
-- [MDN Web Docs: JavaScript](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript) - Documentação oficial e tutorial abrangente.
-- [Codecademy: Learn JavaScript](https://www.codecademy.com/learn/introduction-to-javascript) - Um curso básico interativo para iniciantes.
-- [freeCodeCamp: JavaScript Algorithms and Data Structures](https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/) - Curso gratuito com exercícios práticos.
-- [W3Schools: JavaScript Tutorial](https://www.w3schools.com/js/) - Um guia simples e fácil de seguir para iniciantes.
+    public void depositar(double valor) {
+        saldo += valor;
+    }
+
+    public double getSaldo() {
+        return saldo;
+    }
+}
+```
+
+### 3. Herança
+- A herança permite que uma classe herde características (atributos e métodos) de outra classe. Isso promove a reutilização de código.
+
+**Exemplo:**
+```java
+class Veiculo {
+    void mover() {
+        System.out.println("O veículo está se movendo.");
+    }
+}
+
+class Moto extends Veiculo {
+    void acelerar() {
+        System.out.println("A moto está acelerando.");
+    }
+}
+```
+
+### 4. Polimorfismo
+- O polimorfismo permite que uma classe ou método tenha várias formas. Isso pode ser alcançado através de sobrecarga de métodos ou sobreposição de métodos.
+
+**Exemplo:**
+```java
+class Animal {
+    void fazerSom() {
+        System.out.println("O animal faz som.");
+    }
+}
+
+class Cachorro extends Animal {
+    void fazerSom() {
+        System.out.println("O cachorro late.");
+    }
+}
+
+void escutarSom(Animal animal) {
+    animal.fazerSom();
+}
+
+// Uso
+Animal meuCachorro = new Cachorro();
+escutarSom(meuCachorro); // Saída: O cachorro late.
+```
+
+### 5. Abstração
+- A abstração é o processo de ocultar a complexidade e mostrar apenas os recursos essenciais do objeto.
+
+**Exemplo:**
+```java
+abstract class Forma {
+    abstract void desenhar();
+}
+
+class Circulo extends Forma {
+    void desenhar() {
+        System.out.println("Desenhando um círculo.");
+    }
+}
+```
 
 ## Conclusão
-Este roteiro deve guiá-lo pelos primeiros passos no aprendizado de JavaScript. À medida que você se sentir mais confortável com os conceitos, considere explorar tópicos mais avançados como frameworks (como React ou Vue.js) e manipulação de dados com APIs. Boa sorte em sua jornada de aprendizado!
+Compreender os conceitos de POO é fundamental para desenvolver aplicações mais complexas e eficientes em Java. À medida que você avança, é essencial praticar a implementação desses conceitos em projetos reais.
+
+## Fontes de Estudo
+- **Documentação Oficial do Java:** [Java Documentation](https://docs.oracle.com/en/java/)
+- **Curso de POO em Java - Alura:** [Alura](https://www.alura.com.br/cursos-online-java)
+- **Livro: "Head First Java" de Kathy Sierra e Bert Bates**
+- **Tutorial de POO em Java no W3Schools:** [W3Schools Java POO](https://www.w3schools.com/java/java_oop.asp)
+
+Sinta-se à vontade para explorar essas fontes e pratique a codificação dos exemplos apresentados para consolidar seus conhecimentos. Boa sorte nos seus estudos!
