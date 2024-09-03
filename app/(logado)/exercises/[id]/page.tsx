@@ -1,7 +1,7 @@
 'use client'
 import { set } from "mongoose";
 import { useEffect, useState, useCallback } from "react";
-import Exercise from "@/components/exercise";
+
 import QuestionHolder from "@/components/cards_exercicios/question_holder";
 import { Chip } from "@nextui-org/react";
 

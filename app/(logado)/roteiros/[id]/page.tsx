@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
+import { Chip } from "@nextui-org/react";
 
 export default function RoteiroView({ params }: { params: { id: string } }) {
     const [roteiro, setRoteiro] = useState<any | "">("");
@@ -23,15 +24,43 @@ export default function RoteiroView({ params }: { params: { id: string } }) {
                 body: JSON.stringify({ id: id }),
             });
             const data = await response.json();
-            console.log(data);
             setRoteiro(data);
         };
         getRoteiro();
     }, [id]);
 
     return (
-        <div className="markdown-content">
-            <ReactMarkdown>{roteiro.content}</ReactMarkdown>
-        </div>
+        <main className="w-full flex flex-col items-center">
+            <div className="flex flex-col md:flex-row justify-center items-center md:gap-4">
+                {roteiro ? (
+                    <Chip color="primary" className="mb-4 md:max-w-[60vw]">
+                        Tema: {roteiro.params.tema}
+                    </Chip>
+                ) : (
+                    ""
+                )}
+                {roteiro ? (
+                    <Chip color="secondary" className="mb-4 md:max-w-[60vw]">
+                        Nível de ensino: {roteiro.params.objetivoAprendizado}
+                    </Chip>
+                ) : (
+                    ""
+                )}
+                {roteiro ? (
+                    <Chip color="warning" className="mb-4 text-white md:max-w-[60vw]">
+                        Quantidade: {roteiro.params.nivelConhecimento}
+                    </Chip>
+                ) : (
+                    ""
+                )}
+            </div>
+            {roteiro ? (
+                <div className="md:max-w-[60vw] md:w-1/2 w-[90vw] box-border p-8 box-4">
+                <div dangerouslySetInnerHTML={{ __html: roteiro.content }}></div>
+                </div>
+            ) : (
+                "Carregando..."
+            )}
+        </main>
     );
 }

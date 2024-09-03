@@ -12,10 +12,12 @@ export default function RoteirosForm() {
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [tema, setTema] = useState("");
-    const [nivel, setNivel] = useState("");
-    const [estudandoPara, setEstudandoPara] = useState("");
-    const [formaDeEscrita, setFormaDeEscrita] = useState("");
-    const [requisitosAdicionais, setRequisitosAdicionais] = useState("");
+    const [objetivoAprendizado, setObjetivoAprendizado] = useState("");
+    const [nivelConhecimento, setNivelConhecimento] = useState("");
+    const [disponibilidadeTempo, setDisponibilidadeTempo] = useState("");
+    const [prazo, setPrazo] = useState("");
+    const [estiloAprendizagem, setEstiloAprendizagem] = useState("");
+    const [materiaisEstudo, setMateriaisEstudo] = useState("");
 
     useEffect(() => {
         const token = localStorage.getItem("sophia_token");
@@ -29,10 +31,12 @@ export default function RoteirosForm() {
         setLoading(true);
         const data = {
             tema,
-            nivel,
-            estudandoPara,
-            formaDeEscrita,
-            requisitosAdicionais,
+            objetivoAprendizado,
+            nivelConhecimento,
+            disponibilidadeTempo,
+            prazo,
+            estiloAprendizagem,
+            materiaisEstudo,
         };
         let test = await fetch("/api/roteiros", {
             method: "POST",
@@ -67,51 +71,75 @@ export default function RoteirosForm() {
                     />
                     <Input
                         type="text"
-                        id="nivel"
-                        name="nivel"
-                        label="Nível de aprofundamento:"
-                        value={nivel}
-                        onValueChange={setNivel}
+                        id="objetivo-aprendizado"
+                        name="objetivo-aprendizado"
+                        label="Objetivo de aprendizado:"
+                        value={objetivoAprendizado}
+                        onValueChange={setObjetivoAprendizado}
                         isRequired
                         labelPlacement="outside"
                         variant="bordered"
-                        placeholder="Digite o nível de aprofundamento"
+                        placeholder="Digite o objetivo de aprendizado"
                     />
                     <Input
                         type="text"
-                        id="estudando-para"
-                        name="estudando-para"
-                        label="Estudando para:"
-                        value={estudandoPara}
-                        onValueChange={setEstudandoPara}
+                        id="nivel-conhecimento"
+                        name="nivel-conhecimento"
+                        label="Nível de conhecimento atual:"
+                        value={nivelConhecimento}
+                        onValueChange={setNivelConhecimento}
                         isRequired
                         labelPlacement="outside"
                         variant="bordered"
-                        placeholder="Digite para que está estudando"
+                        placeholder="Digite o nível de conhecimento atual"
                     />
                     <Input
                         type="text"
-                        id="forma-de-escrita"
-                        name="forma-de-escrita"
-                        label="Forma de escrita:"
-                        value={formaDeEscrita}
-                        onValueChange={setFormaDeEscrita}
+                        id="disponibilidade-tempo"
+                        name="disponibilidade-tempo"
+                        label="Disponibilidade de tempo:"
+                        value={disponibilidadeTempo}
+                        onValueChange={setDisponibilidadeTempo}
                         isRequired
                         labelPlacement="outside"
                         variant="bordered"
-                        placeholder="Digite a forma de escrita"
+                        placeholder="Digite a disponibilidade de tempo"
                     />
                     <Input
                         type="text"
-                        id="requisitos-adicionais"
-                        name="requisitos-adicionais"
-                        label="Requisitos adicionais:"
-                        value={requisitosAdicionais}
-                        onValueChange={setRequisitosAdicionais}
+                        id="prazo"
+                        name="prazo"
+                        label="Prazo:"
+                        value={prazo}
+                        onValueChange={setPrazo}
                         isRequired
                         labelPlacement="outside"
                         variant="bordered"
-                        placeholder="Digite os requisitos adicionais"
+                        placeholder="Digite o prazo"
+                    />
+                    <Input
+                        type="text"
+                        id="estilo-aprendizagem"
+                        name="estilo-aprendizagem"
+                        label="Estilo de aprendizagem:"
+                        value={estiloAprendizagem}
+                        onValueChange={setEstiloAprendizagem}
+                        isRequired
+                        labelPlacement="outside"
+                        variant="bordered"
+                        placeholder="Digite o estilo de aprendizagem"
+                    />
+                    <Input
+                        type="text"
+                        id="materiais-estudo"
+                        name="materiais-estudo"
+                        label="Materiais de estudo preferidos:"
+                        value={materiaisEstudo}
+                        onValueChange={setMateriaisEstudo}
+                        isRequired
+                        labelPlacement="outside"
+                        variant="bordered"
+                        placeholder="Digite os materiais de estudo preferidos"
                     />
                     <Button isLoading={loading} onClick={handleSubmit} className="btn-gradient mt-6">
                         Gerar exercícios

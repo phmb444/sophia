@@ -1,116 +1,44 @@
-# Roteiro de Estudo: Programação Orientada a Objetos (POO) em Java
-
-## Introdução à POO
-A Programação Orientada a Objetos é um paradigma de programação que utiliza "objetos" para modelar dados e comportamentos. Em Java, a POO permite a construção de programas mais modularizados e reutilizáveis.
-
-## Principais Conceitos de POO
-
-### 1. Classes e Objetos
-- **Classe**: Um modelo ou um blueprint a partir do qual objetos são criados.
-- **Objeto**: Uma instância de uma classe.
-
-**Exemplo:**
-```java
-class Carro {
-    String modelo;
-    String cor;
+<div class="bg-white text-gray-800 font-sans">
+    <h1 class="text-3xl font-bold">Roteiro de Estudo: Egito Antigo</h1>
     
-    void acelerar() {
-        System.out.println("O carro está acelerando.");
-    }
-}
+    <h2 class="text-2xl font-semibold mt-4">1. Introdução ao Egito Antigo</h2>
+    <p>O Egito Antigo é uma das civilizações mais impactantes da história, desenvolvendo-se ao longo do Rio Nilo e influenciando diversas áreas, como a política, economia, e religião.</p>
+    
+    <h2 class="text-2xl font-semibold mt-4">2. Períodos Históricos</h2>
+    <h3 class="text-xl font-semibold mt-2">2.1. Período Pré-Dinástico (5000-3200 a.C.)</h3>
+    <p>A organização social inicial em nomos, a unificação dos reinos do Alto e Baixo Egito por Menés.</p>
+    
+    <h3 class="text-xl font-semibold mt-2">2.2. Período Dinástico (3200-1085 a.C.)</h3>
+    <p>Dividido em três grandes impérios: Antigo, Médio e Novo Império, cada um marcando avanços significativos.</p>
+    
+    <h2 class="text-2xl font-semibold mt-4">3. Organização Social</h2>
+    <p>A sociedade era hierarquizada, com o faraó no topo, seguido por sacerdotes, escribas e artistas, terminando com agricultores e escravos.</p>
+    
+    <h2 class="text-2xl font-semibold mt-4">4. Economia</h2>
+    <p>Baseada principalmente na agricultura, favorecida pelo Rio Nilo, que possibilitava práticas como irrigação e cultivo de cereais.</p>
+    
+    <h2 class="text-2xl font-semibold mt-4">5. Cultura e Religião</h2>
+    <h3 class="text-xl font-semibold mt-2">5.1. Politeísmo</h3>
+    <p>A crença em diversos deuses, como Rá e Osíris, e a prática de rituais complexos relacionados à morte e ao além.</p>
+    
+    <h3 class="text-xl font-semibold mt-2">5.2. Escritura e Arte</h3>
+    <p>Desenvolvimento da escrita hieroglífica e produções artísticas que serviam tanto para fins religiosos quanto comemorativos.</p>
 
-Carro meuCarro = new Carro();
-meuCarro.modelo = "Fusca";
-meuCarro.cor = "azul";
-meuCarro.acelerar();
-```
+    <h2 class="text-2xl font-semibold mt-4">6. Contribuições Científicas</h2>
+    <p>Avanços notáveis em matemática, medicina, e engenharia, exemplificados pela construção das pirâmides.</p>
 
-### 2. Encapsulamento
-- O encapsulamento envolve ocultar os detalhes internos de uma classe e proteger os dados. Isso é realizado através do uso de modificadores de acesso.
+    <h2 class="text-2xl font-semibold mt-4">7. Declínio do Egito Antigo</h2>
+    <p>Invasões por povos externos e conflitos internos levaram à decadência da civilização egípcia, culminando na sua subjugação por impérios como o Romano.</p>
 
-**Exemplo:**
-```java
-class ContaBancaria {
-    private double saldo;
+    <h2 class="text-2xl font-semibold mt-4">8. Fontes de Estudo Sugeridas</h2>
+    <ul>
+        <li><a href="https://vestibulares.estrategia.com/portal/materias/historia/egito-antigo-resumo/" class="text-blue-500 underline">Egito Antigo: resumo, história, características e mais</a></li>
+        <li><a href="https://www.significados.com.br/egito-antigo/" class="text-blue-500 underline">Egito Antigo: resumo, história e mapa da civilização</a></li>
+        <li><a href="https://brasilescola.uol.com.br/historiag/egipcio.htm" class="text-blue-500 underline">Egito Antigo: períodos, mapa, características - Brasil Escola</a></li>
+        <li><a href="https://guiadoestudante.abril.com.br/estudo/resumo-de-historia-egito-antigo" class="text-blue-500 underline">Resumo de História: Egito Antigo</a></li>
+        <li><a href="https://monografias.brasilescola.uol.com.br/historia/egito-antigo.htm" class="text-blue-500 underline">Egito Antigo - Monografias Brasil Escola</a></li>
+    </ul>
 
-    public void depositar(double valor) {
-        saldo += valor;
-    }
-
-    public double getSaldo() {
-        return saldo;
-    }
-}
-```
-
-### 3. Herança
-- A herança permite que uma classe herde características (atributos e métodos) de outra classe. Isso promove a reutilização de código.
-
-**Exemplo:**
-```java
-class Veiculo {
-    void mover() {
-        System.out.println("O veículo está se movendo.");
-    }
-}
-
-class Moto extends Veiculo {
-    void acelerar() {
-        System.out.println("A moto está acelerando.");
-    }
-}
-```
-
-### 4. Polimorfismo
-- O polimorfismo permite que uma classe ou método tenha várias formas. Isso pode ser alcançado através de sobrecarga de métodos ou sobreposição de métodos.
-
-**Exemplo:**
-```java
-class Animal {
-    void fazerSom() {
-        System.out.println("O animal faz som.");
-    }
-}
-
-class Cachorro extends Animal {
-    void fazerSom() {
-        System.out.println("O cachorro late.");
-    }
-}
-
-void escutarSom(Animal animal) {
-    animal.fazerSom();
-}
-
-// Uso
-Animal meuCachorro = new Cachorro();
-escutarSom(meuCachorro); // Saída: O cachorro late.
-```
-
-### 5. Abstração
-- A abstração é o processo de ocultar a complexidade e mostrar apenas os recursos essenciais do objeto.
-
-**Exemplo:**
-```java
-abstract class Forma {
-    abstract void desenhar();
-}
-
-class Circulo extends Forma {
-    void desenhar() {
-        System.out.println("Desenhando um círculo.");
-    }
-}
-```
-
-## Conclusão
-Compreender os conceitos de POO é fundamental para desenvolver aplicações mais complexas e eficientes em Java. À medida que você avança, é essencial praticar a implementação desses conceitos em projetos reais.
-
-## Fontes de Estudo
-- **Documentação Oficial do Java:** [Java Documentation](https://docs.oracle.com/en/java/)
-- **Curso de POO em Java - Alura:** [Alura](https://www.alura.com.br/cursos-online-java)
-- **Livro: "Head First Java" de Kathy Sierra e Bert Bates**
-- **Tutorial de POO em Java no W3Schools:** [W3Schools Java POO](https://www.w3schools.com/java/java_oop.asp)
-
-Sinta-se à vontade para explorar essas fontes e pratique a codificação dos exemplos apresentados para consolidar seus conhecimentos. Boa sorte nos seus estudos!
+    <h2 class="text-2xl font-semibold mt-4">9. Conclusão</h2>
+    <p>O estudo do Egito Antigo fornece uma compreensão fundamental do desenvolvimento humano, política, e cultura ao longo da história.</p>
+</div>
