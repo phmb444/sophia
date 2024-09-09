@@ -25,16 +25,20 @@ export default function Login() {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
-    const result = await fetch("/api/login", {
+    let result = await fetch("/api/login", {
       method: "POST",
       body: formData,
-    }).then((response) => response.json());
-    
-    if (typeof result === "string") {
+    })
+    if (result.status == 500){
+      setError("Erro interno do servidor, tente novamente")
+      setLoading(false)
+    }
+    const response = await result.json()
+    if (typeof response === "string") {
       setLoading(false);
-      setError(result);
+      setError(response);
     } else {
-      localStorage.setItem("sophia_token", result.token);
+      localStorage.setItem("sophia_token", response.token);
       window.location.href = "/home";
     }
   }

@@ -35,7 +35,7 @@ export default function RoteirosHistoryModal() {
                     <ModalBody>
                         {!roteiros.length && <p>Nenhum roteiro encontrado</p>}
                         {roteiros.map((roteiro: any) => (
-                            <p key={roteiro.id}> <Link href={`/roteiros/${roteiro.id}`}>{roteiro.params.tema}, {roteiro.params.nivel}, {roteiro.params.estudandoPara}, {new Date(roteiro.date).toLocaleDateString('pt-BR')} </Link></p>
+                            <p key={roteiro.id}> <Link href={`/roteiros/${roteiro.id}`}>{roteiro.params.tema}, {roteiro.params.objetivoAprendizado}, {roteiro.params.nivelConhecimentob}, {new Date(roteiro.date).toLocaleDateString('pt-BR')} </Link></p>
                         ))}
                     </ModalBody>
                     <ModalFooter>

@@ -41,14 +41,14 @@ export default function RoteiroView({ params }: { params: { id: string } }) {
                 )}
                 {roteiro ? (
                     <Chip color="secondary" className="mb-4 md:max-w-[60vw]">
-                        Nível de ensino: {roteiro.params.objetivoAprendizado}
+                        Objetivo: {roteiro.params.objetivoAprendizado}
                     </Chip>
                 ) : (
                     ""
                 )}
                 {roteiro ? (
                     <Chip color="warning" className="mb-4 text-white md:max-w-[60vw]">
-                        Quantidade: {roteiro.params.nivelConhecimento}
+                        Conhecimento previo: {roteiro.params.nivelConhecimento}
                     </Chip>
                 ) : (
                     ""

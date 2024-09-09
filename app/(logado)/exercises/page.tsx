@@ -10,7 +10,7 @@ import ExercisesHistory from "@/components/exercises_history_modal";
 
 
 export default function Exercises() {
-
+  const [error, setError] = useState("");
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [tema, setTema] = useState("");
@@ -29,6 +29,11 @@ export default function Exercises() {
 
 
   async function handleSubmit() {
+    if (!tema || !quantidade || !nivel || tipos.length === 0) {
+      setError("Por favor, preencha todos os campos.");
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const data = {
       tema,
@@ -39,12 +44,19 @@ export default function Exercises() {
     let test = await fetch ('/api/exercises', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Token': token as string,
+      'Content-Type': 'application/json',
+      'Token': token as string,
       },
       body: JSON.stringify(data),
     });
-    let response = await test.json();
+    if (test.status === 500) {
+      setError("Erro interno do servidor, tente novamente");
+      setLoading(false);
+      return;
+    }
+    const response = await test.json()
+
+    
     window.location.href = `/exercises/${response.id}`;
   }
 
@@ -163,7 +175,7 @@ export default function Exercises() {
           <Button isLoading={loading} onClick={handleSubmit} className="btn-gradient mt-6">
             Gerar exercícios
           </Button>
-          
+          {error ? <p className="text-red-500">{error}</p> : ""}
         </div>
       </main>
     </div>

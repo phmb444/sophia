@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'; // Import the 'jwt'
 import bcrypt from 'bcrypt';
 
 export async function generateJWT(id: string, secret: string) {
-    const jwtToken = jwt.sign({ id }, secret , { expiresIn: '7d' }); 
+    const jwtToken = jwt.sign({ id }, secret);
     return jwtToken;
 }
 

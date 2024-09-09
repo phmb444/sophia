@@ -10,6 +10,7 @@ import RoteirosHistoryModal from "@/components/roteiros_history_modal";
 
 export default function RoteirosForm() {
     const [token, setToken] = useState<string | null>(null);
+    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [tema, setTema] = useState("");
     const [objetivoAprendizado, setObjetivoAprendizado] = useState("");
@@ -28,6 +29,11 @@ export default function RoteirosForm() {
     }, []);
 
     async function handleSubmit() {
+        if (!tema || !objetivoAprendizado || !nivelConhecimento || !disponibilidadeTempo) {
+            setError("Por favor, preencha todos os campos.");
+            setLoading(false);
+            return;
+        }
         setLoading(true);
         const data = {
             tema,
@@ -38,15 +44,21 @@ export default function RoteirosForm() {
             estiloAprendizagem,
             materiaisEstudo,
         };
+        
         let test = await fetch("/api/roteiros", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                Token: token as string,
+            "Content-Type": "application/json",
+            Token: token as string,
             },
             body: JSON.stringify(data),
         });
-        let response = await test.json();
+        if (test.status === 500) {
+            setError("Erro interno do servidor, tente novamente");
+            setLoading(false);
+            return;
+          }
+        const response = await test.json()
         window.location.href = `/roteiros/${response.id}`;
     }
 
@@ -112,7 +124,7 @@ export default function RoteirosForm() {
                         label="Prazo:"
                         value={prazo}
                         onValueChange={setPrazo}
-                        isRequired
+                      
                         labelPlacement="outside"
                         variant="bordered"
                         placeholder="Digite o prazo"
@@ -124,7 +136,7 @@ export default function RoteirosForm() {
                         label="Estilo de aprendizagem:"
                         value={estiloAprendizagem}
                         onValueChange={setEstiloAprendizagem}
-                        isRequired
+                 
                         labelPlacement="outside"
                         variant="bordered"
                         placeholder="Digite o estilo de aprendizagem"
@@ -136,7 +148,7 @@ export default function RoteirosForm() {
                         label="Materiais de estudo preferidos:"
                         value={materiaisEstudo}
                         onValueChange={setMateriaisEstudo}
-                        isRequired
+                  
                         labelPlacement="outside"
                         variant="bordered"
                         placeholder="Digite os materiais de estudo preferidos"
@@ -144,6 +156,7 @@ export default function RoteirosForm() {
                     <Button isLoading={loading} onClick={handleSubmit} className="btn-gradient mt-6">
                         Gerar exercícios
                     </Button>
+                    {error ? <p className="text-red-500">{error}</p> : ""}
                 </div>
             </main>
         </div>
