@@ -57,9 +57,11 @@ export async function POST(request: Request) {
     querys.querys[i] = querys.querys[i].replace(/ /g, "%20");
   }
 
-  for (let i = 0; i < querys.querys.length; i++) {
-    const busca = `${JINA_URL}${querys.querys[i]}`;
+  // Executar os fetchs de forma assíncrona e esperar todos serem resolvidos
+  const fetchPromises = querys.querys.map(async (query:any) => {
+    const busca = `${JINA_URL}${query}`;
     console.log(busca);
+
     const webContent = await fetch(busca, {
       method: "GET",
       headers: {
@@ -67,9 +69,18 @@ export async function POST(request: Request) {
         Accept: "application/json",
       },
     });
+
     const data = await webContent.json();
-    parameters.webContent.push(data.data[0], data.data[1]);
-  }
+    return [data.data[0], data.data[1]];
+  });
+
+  // Esperar que todas as requisições sejam resolvidas
+  const results = await Promise.all(fetchPromises);
+
+  // Adicionar os resultados ao parameters.webContent
+  results.forEach((result) => {
+    parameters.webContent.push(...result);
+  });
 
   const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
