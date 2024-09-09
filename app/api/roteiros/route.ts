@@ -58,7 +58,7 @@ export async function POST(request: Request) {
   }
 
   for (let i = 0; i < querys.querys.length; i++) {
-    const busca = `${JINA_URL}?q=${querys.querys[i]}`;
+    const busca = `${JINA_URL}/${querys.querys[i]}`;
     console.log(busca);
     const webContent = await fetch(busca, {
       method: "GET",
