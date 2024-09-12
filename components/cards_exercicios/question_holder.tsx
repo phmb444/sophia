@@ -18,7 +18,7 @@ export default function QuestionHolder(questoes: any) {
                     )}
                 </div>
             ))}
-            <Button color="primary" variant='flat' className='w-full' onClick={() => navigator.clipboard.writeText(window.location.href)}>
+            <Button color="primary" variant='flat' className='w-full mb-12' onClick={() => navigator.clipboard.writeText(window.location.href)}>
                 <Share className="w-4 h-4 mr-2" />
                 Compartilhar lista de exercicios
             </Button>
