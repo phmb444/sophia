@@ -17,14 +17,6 @@ export default function StudyItineraryPage(data: {data:any}) {
     )
   }
 
-  const itineraryItems = [
-    { title: "Introduction to React", duration: "2 hours", description: "Learn the basics of React, including components, props, and state." },
-    { title: "State Management", duration: "1.5 hours", description: "Explore state management in React, focusing on hooks like useState and useContext." },
-    { title: "React Router", duration: "1 hour", description: "Understand how to implement routing in React applications using React Router." },
-    { title: "API Integration", duration: "2 hours", description: "Learn how to integrate APIs into your React app using fetch or axios." },
-    { title: "Testing React Applications", duration: "1.5 hours", description: "Introduction to testing React components using Jest and React Testing Library." }
-  ]
-
   return (
     <div className="min-h-screen md:w-[60vw] w-[90vw] rounded-2xl mb-4 bg-gray-100 roteiro">
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
