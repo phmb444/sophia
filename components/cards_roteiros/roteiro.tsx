@@ -83,15 +83,15 @@ export default function StudyItineraryPage(data: {data:any}) {
                   </div>
                 </CardBody>
                 <CardFooter className="flex flex-col space-y-2 items-start">
-                  <Button color="primary" variant='flat' className='w-60' onClick={() => navigator.clipboard.writeText(window.location.href)}>
+                  <Button color="primary" variant='flat' className='w-full' onClick={() => navigator.clipboard.writeText(window.location.href)}>
                     <Share className="w-4 h-4 mr-2" />
                     Compartilhar Roteiro
                   </Button>
-                  <Button color="default"  className='w-60' >
+                  <Button color="default"  className='w-full' >
                     <Download className="w-4 h-4 mr-2" />
                     Baixar como PDF
                   </Button>
-                  <Button color="default" className='w-60' >
+                  <Button color="default" className='w-full' >
                     <Printer className="w-4 h-4 mr-2" />
                     Imprimir roteiro
                   </Button>
