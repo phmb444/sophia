@@ -9,6 +9,7 @@ import {
     Button,
 } from "@nextui-org/react";
 import { useState } from "react";
+import { Link } from "@nextui-org/react";
 
 export default function QuestaoAlternativa({ questao, index }: any) {
     console.log(questao);
@@ -16,13 +17,13 @@ export default function QuestaoAlternativa({ questao, index }: any) {
     const [mensagem, setMensagem] = useState("");
 
     function handleClick(letra: string) {
-    
+
         if (questao.correct_answer === letra) {
-      
+
             setMensagem("Resposta correta!");
             setAcertou(true);
         } else {
- 
+
             setMensagem("Resposta incorreta!");
             setAcertou(false);
         }
@@ -30,37 +31,51 @@ export default function QuestaoAlternativa({ questao, index }: any) {
     return (
         <>
             <Card className="mb-4">
-                <CardHeader className="font-bold">{index + 1}) {questao.question}</CardHeader>
+                <CardHeader className="font-bold flex flex-col items-start">{index + 1}) {questao.question}
+                    {questao.source && (
+                        <Link className="text-sm" isExternal showAnchorIcon size="sm" target="_blank" href={questao.source}>
+                            {questao.source}
+                        </Link>
+                    )}
+                </CardHeader>
                 <CardBody>
                     <Divider />
-                    <ul className="flex flex-col w-full mt-4 justify-between space-y-4">
-                        <li className="flex items-center">
+                    <ul className="flex flex-col w-full mt-4 justify-between space-y-4 overflow-x-scroll">
+                        <li className="flex items-center overflow-x-auto">
                             <p className={`mr-2 ${acertou && questao.correct_answer === "a" ? "text-green-500" : ""}`}>a)</p>
                             <Button variant={acertou && questao.correct_answer === "a" ? "solid" : "bordered"} onPress={() => handleClick("a")} className={acertou && questao.correct_answer === "a" ? "bg-green-500" : ""}>
+
                                 {questao.options.a}
+
                             </Button>
                         </li>
-                        <li className="flex items-center">
+                        <li className="flex items-center overflow-x-auto">
                             <p className={`mr-2 ${acertou && questao.correct_answer === "b" ? "text-green-500" : ""}`}>b)</p>
                             <Button variant={acertou && questao.correct_answer === "b" ? "solid" : "bordered"} onPress={() => handleClick("b")} className={acertou && questao.correct_answer === "b" ? "bg-green-500" : ""}>
+
                                 {questao.options.b}
+
                             </Button>
                         </li>
-                        <li className="flex items-center">
+                        <li className="flex items-center overflow-x-auto">
                             <p className={`mr-2 ${acertou && questao.correct_answer === "c" ? "text-green-500" : ""}`}>c)</p>
                             <Button variant={acertou && questao.correct_answer === "c" ? "solid" : "bordered"} onPress={() => handleClick("c")} className={acertou && questao.correct_answer === "c" ? "bg-green-500" : ""}>
+
                                 {questao.options.c}
+
                             </Button>
                         </li>
-                        <li className="flex items-center">
+                        <li className="flex items-center overflow-x-auto">
                             <p className={`mr-2 ${acertou && questao.correct_answer === "d" ? "text-green-500" : ""}`}>d)</p>
                             <Button variant={acertou && questao.correct_answer === "d" ? "solid" : "bordered"} onPress={() => handleClick("d")} className={acertou && questao.correct_answer === "d" ? "bg-green-500" : ""}>
+
                                 {questao.options.d}
+
                             </Button>
                         </li>
                     </ul>
                 </CardBody>
-                
+
                 <CardFooter className="flex-col items-start">
                     <p className={`text-${acertou ? "green" : "red"}-500`}>
                         {mensagem}
@@ -68,7 +83,7 @@ export default function QuestaoAlternativa({ questao, index }: any) {
 
                     {acertou && (
                         <>
-                        <Divider className="my-2" />
+                            <Divider className="my-2" />
                             <p className="font-bold">
                                 Resposta correta: {questao.correct_answer}
                             </p>

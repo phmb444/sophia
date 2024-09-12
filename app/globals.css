@@ -104,29 +104,6 @@
   @apply bg-zinc-300 text-zinc-900;
 }
 
-.markdown-content,
-.markdown-content * {
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #333;
-}
-
-.markdown-content h1 {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
-}
-
-.markdown-content p {
-  margin-bottom: 10px;
-}
-
-.markdown-content a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.markdown-content a:hover {
-  text-decoration: underline;
+.roteiro p {
+  @apply ml-[5px];
 }

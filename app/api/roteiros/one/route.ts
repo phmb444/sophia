@@ -19,7 +19,6 @@ export async function POST(req: Request) {
         const roteiro = await prisma.roteiros.findUnique({
             where: {
                 id: data.id,
-                authorId: decoded.id,
             },
         });
         return new Response(JSON.stringify(roteiro));

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { Chip } from "@nextui-org/react";
+import StudyItineraryPage from "@/components/cards_roteiros/roteiro";
 
 export default function RoteiroView({ params }: { params: { id: string } }) {
     const [roteiro, setRoteiro] = useState<any | "">("");
@@ -33,34 +34,33 @@ export default function RoteiroView({ params }: { params: { id: string } }) {
         <main className="w-full flex flex-col items-center">
             <div className="flex flex-col md:flex-row justify-center items-center md:gap-4">
                 {roteiro ? (
-                    <Chip color="primary" className="mb-4 md:max-w-[60vw]">
-                        Tema: {roteiro.params.tema}
+                    <Chip color="primary" className="mb-4 text-white md:max-w-[60vw]">
+                        Tema: {roteiro.params.tema.length > 30 ? `${roteiro.params.tema.substring(0, 35)}...` : roteiro.params.tema}
                     </Chip>
                 ) : (
                     ""
                 )}
                 {roteiro ? (
-                    <Chip color="secondary" className="mb-4 md:max-w-[60vw]">
-                        Objetivo: {roteiro.params.objetivoAprendizado}
+                    <Chip color="secondary" className="mb-4  text-white md:max-w-[60vw]">
+                        Objetivo: {roteiro.params.objetivoAprendizado.length > 30 ? `${roteiro.params.objetivoAprendizado.substring(0, 35)}...` : roteiro.params.objetivoAprendizado}
                     </Chip>
                 ) : (
                     ""
                 )}
                 {roteiro ? (
                     <Chip color="warning" className="mb-4 text-white md:max-w-[60vw]">
-                        Conhecimento previo: {roteiro.params.nivelConhecimento}
+                        Conhecimento previo: {roteiro.params.nivelConhecimento.length > 30 ? `${roteiro.params.nivelConhecimento.substring(0, 35)}...` : roteiro.params.nivelConhecimento}
                     </Chip>
                 ) : (
                     ""
                 )}
             </div>
             {roteiro ? (
-                <div className="md:max-w-[60vw] md:w-1/2 w-[90vw] box-border p-8 box-4">
-                <div dangerouslySetInnerHTML={{ __html: roteiro.content }}></div>
-                </div>
-            ) : (
-                "Carregando..."
-            )}
+                <StudyItineraryPage data={roteiro} />) : (
+                ""
+            )
+            }
+
         </main>
     );
 }

@@ -35,7 +35,7 @@ model roteiros {
   params Json
   author users? @relation(fields: [authorId], references: [id])
   authorId String?
-  content String
+  content Json
 }
 
 

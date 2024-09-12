@@ -6,8 +6,9 @@ import {
     Divider,
     Button,
     Textarea,
+    Link,
 } from "@nextui-org/react";
-import { use, useState } from "react";
+import { useState } from "react";
 
 
 export default function QuestaoDissertativa({ questao, index }: any) {
@@ -37,7 +38,12 @@ export default function QuestaoDissertativa({ questao, index }: any) {
 
     return (
         <Card className="mb-4">
-            <CardHeader className="font-bold">{index + 1}) {questao.question}</CardHeader>
+            <CardHeader className="font-bold flex flex-col items-start">{index + 1}) {questao.question}</CardHeader>
+            {questao.source && (
+                <Link className="text-sm" isExternal showAnchorIcon size="sm" target="_blank" href={questao.source}>
+                    {questao.source}
+                </Link>
+            )}
             <CardBody>
                 <Divider className="mb-4" />
                 <Textarea
