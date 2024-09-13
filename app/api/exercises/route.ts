@@ -174,10 +174,6 @@ export async function PUT(request: Request) {
   for (const file of uploadedFiles) {
     if (file instanceof File) {
       files.push(file);
-      // Salvar arquivo na pasta public/files
-      const buffer = await file.arrayBuffer();
-      const filePath = path.join(process.cwd(), 'public', 'files', file.name);
-      await fs.writeFile(filePath, Buffer.from(buffer));
     }
   }
 
