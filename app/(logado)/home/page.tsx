@@ -31,34 +31,12 @@ export default function Home() {
               Corrija seus textos e trabalhos
             </p>
             <p className="text-xl font-semibold">
-              Em desenvolvimento
+              Receba um parecer detalhado sobre seu texto, com sugestões de
+              melhorias e correções.
             </p>
           </div>
           <div className="w-1/5 h-full flex flex-col justify-between items-center">
-            <HoverCard.Root>
-              <HoverCard.Trigger>
-                <img
-                  src="information.png"
-                  alt=""
-                  className="hover:scale-110 hover:cursor-pointer transition-all"
-                />
-              </HoverCard.Trigger>
-              <HoverCard.Portal>
-                <HoverCard.Content>
-                  <p
-                    className=" mt-4 w-60 p-4 h-40 rounded-xl bg-zinc-100 border-2 "
-                    style={{
-                      boxShadow: "2px 0px 15px 0px rgba(0, 0, 0, 0.25)",
-                    }}
-                  >
-                    Receba um parecer com sugestões de mundanças, explicações
-                    sobre regras de português e correção de respostas
-                    incorretas.
-                  </p>
-                </HoverCard.Content>
-              </HoverCard.Portal>
-            </HoverCard.Root>
-            {/*<img src="arrow.png" alt="" className="absolute bottom-6 right-6 hover:scale-110 hover:cursor-pointer transition-all"/>*/}
+            <a href="correcoes"><img src="arrow.png" alt="" className="absolute bottom-6 right-6 hover:scale-110 hover:cursor-pointer transition-all"/></a>
           </div>
         </div>
 
@@ -70,29 +48,6 @@ export default function Home() {
             </p>
           </div>
           <div className="w-1/5 h-full flex flex-col justify-between items-center">
-            <HoverCard.Root>
-              <HoverCard.Trigger>
-                <img
-                  src="information.png"
-                  alt=""
-                  className="hover:scale-110 hover:cursor-pointer transition-all"
-                />
-              </HoverCard.Trigger>
-              <HoverCard.Portal>
-                <HoverCard.Content>
-                  <p
-                    className=" mt-4 w-60 p-4 h-40 rounded-xl bg-zinc-100 border-2 "
-                    style={{
-                      boxShadow: "2px 0px 15px 0px rgba(0, 0, 0, 0.25)",
-                    }}
-                  >
-                    Receba um parecer com sugestões de mundanças, explicações
-                    sobre regras de português e correção de respostas
-                    incorretas.
-                  </p>
-                </HoverCard.Content>
-              </HoverCard.Portal>
-            </HoverCard.Root>
             <a href="/exercises">
               <img
                 src="arrow.png"
@@ -110,29 +65,6 @@ export default function Home() {
             </p>
           </div>
           <div className="w-1/5 h-full flex flex-col justify-between items-center">
-            <HoverCard.Root>
-              <HoverCard.Trigger>
-                <img
-                  src="information.png"
-                  alt=""
-                  className="hover:scale-110 hover:cursor-pointer transition-all"
-                />
-              </HoverCard.Trigger>
-              <HoverCard.Portal>
-                <HoverCard.Content>
-                  <p
-                    className=" mt-4 w-60 p-4 h-40 rounded-xl bg-zinc-100 border-2 "
-                    style={{
-                      boxShadow: "2px 0px 15px 0px rgba(0, 0, 0, 0.25)",
-                    }}
-                  >
-                    Receba um parecer com sugestões de mundanças, explicações
-                    sobre regras de português e correção de respostas
-                    incorretas.
-                  </p>
-                </HoverCard.Content>
-              </HoverCard.Portal>
-            </HoverCard.Root>
             <a href="/roteiros"><img src="arrow.png" alt="" className="absolute bottom-6 right-6 hover:scale-110 hover:cursor-pointer transition-all"/></a>
           </div>
         </div>
