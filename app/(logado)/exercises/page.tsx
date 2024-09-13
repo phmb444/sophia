@@ -4,7 +4,7 @@ import { Button } from "@nextui-org/react";
 import { Divider } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/react";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import ExercisesHistory from "@/components/exercises_history_modal";
 
 
@@ -17,7 +17,7 @@ export default function Exercises() {
   const [quantidade, setQuantidade] = useState("");
   const [nivel, setNivel] = useState("");
   const [tipos, setTipos] = useState(["Alternativas"]);
-  const [files, setFiles] = useState<FileList | null>(null);  
+  const [files, setFiles] = useState<FileList | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("sophia_token");
@@ -35,30 +35,58 @@ export default function Exercises() {
       return;
     }
     setLoading(true);
-    const data = {
-      tema,
-      quantidade,
-      nivel,
-      tipos,
-    };
-    let test = await fetch ('/api/exercises', {
-      method: 'POST',
-      headers: {
-      'Content-Type': 'application/json',
-      'Token': token as string,
-      },
-      body: JSON.stringify(data),
-    });
-    if (test.status === 500) {
-      setError("Erro interno do servidor, tente novamente");
-      setLoading(false);
-      return;
-    }
-    const response = await test.json()
 
-    
-    window.location.href = `/exercises/${response.id}`;
+    let requestOptions: RequestInit = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Token: token as string,
+      },
+      body: JSON.stringify({
+        tema,
+        quantidade,
+        nivel,
+        tipos,
+      }),
+    };
+
+    if (files) {
+      const formData = new FormData();
+      formData.append("tema", tema);
+      formData.append("quantidade", quantidade);
+      formData.append("nivel", nivel);
+      formData.append("tipos", JSON.stringify(tipos));
+
+      Array.from(files).forEach((file) => {
+        formData.append("files", file);
+      });
+
+      requestOptions = {
+        method: "PUT",
+        headers: {
+          Token: token as string,
+        },
+        body: formData,
+      };
+    }
+
+    try {
+      const response = await fetch("/api/exercises", requestOptions);
+
+      if (response.status === 500) {
+        setError("Erro interno do servidor, tente novamente");
+        setLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+      window.location.href = `/exercises/${data.id}`;
+    } catch (error) {
+      setError("Erro na comunicação com o servidor.");
+      setLoading(false);
+    }
   }
+
 
   const [fileError, setFileError] = useState("");
 

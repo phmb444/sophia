@@ -38,12 +38,14 @@ export default function QuestaoDissertativa({ questao, index }: any) {
 
     return (
         <Card className="mb-4">
-            <CardHeader className="font-bold flex flex-col items-start">{index + 1}) {questao.question}</CardHeader>
+            <CardHeader className="font-bold flex flex-col items-start">{index + 1}) {questao.question}
             {questao.source && (
                 <Link className="text-sm" isExternal showAnchorIcon size="sm" target="_blank" href={questao.source}>
                     {questao.source}
                 </Link>
             )}
+            </CardHeader>
+            
             <CardBody>
                 <Divider className="mb-4" />
                 <Textarea
