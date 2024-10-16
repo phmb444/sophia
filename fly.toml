@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for sophia-still-snowflake-4202 on 2024-09-09T16:04:41-03:00
+# fly.toml app configuration file generated for soph-ia on 2024-09-16T11:41:25-03:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'sophia-still-snowflake-4202'
+app = 'soph-ia'
 primary_region = 'gig'
 
 [build]
