@@ -1,8 +1,8 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { FormEvent } from "react";
 import { useState } from "react";
-import InfoSection from "@/components/information_section";
 import { set } from "mongoose";
 import { Button } from "@nextui-org/react";
 

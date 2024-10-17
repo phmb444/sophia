@@ -2,7 +2,7 @@
 import { set } from "mongoose";
 import { useEffect, useState, useCallback } from "react";
 
-import QuestionHolder from "@/components/cards_exercicios/question_holder";
+import QuestionHolder from "@/components/exercicios/QuestionLoader";
 import { Chip } from "@nextui-org/react";
 
 export default function ExerciseView({ params }: { params: { id: string } }) {

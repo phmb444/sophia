@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { Chip } from "@nextui-org/react";
-import StudyItineraryPage from "@/components/cards_roteiros/roteiro";
+import StudyItineraryPage from "@/components/roteiros/roteiro";
 
 export default function RoteiroView({ params }: { params: { id: string } }) {
     const [roteiro, setRoteiro] = useState<any | "">("");

@@ -5,7 +5,7 @@ import { Divider } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { CheckboxGroup, Checkbox } from "@nextui-org/react";
 import { useState, useEffect } from "react";
-import RoteirosHistoryModal from "@/components/roteiros_history_modal";
+import RoteirosHistoryModal from "@/components/roteiros/roteiros_history_modal";
 
 
 export default function RoteirosForm() {

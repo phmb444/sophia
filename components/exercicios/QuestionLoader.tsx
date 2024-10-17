@@ -1,7 +1,7 @@
 'use client'
 import { Share } from "lucide-react";
-import QuestaoAlternativa from "./questao_alternativa"
-import QuestaoDissertativa from "./questao_dissertativa"
+import QuestaoAlternativa from "./QuestaoAlternativa"
+import QuestaoDissertativa from "./QuestaoDissertativa"
 import { Button } from "@nextui-org/react";
 
 

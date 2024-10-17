@@ -5,7 +5,6 @@ import { FormEvent } from "react";
 import { useState,useEffect } from "react";
 import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
-import InfoSection from "@/components/information_section";
 
 export default function Login() {
   const [error, setError] = useState<string | null>(null);

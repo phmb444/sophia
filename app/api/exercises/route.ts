@@ -1,9 +1,7 @@
 import OpenAI from "openai";
 import { verifyJWT } from "@/lib/util";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
-import { promises as fs } from 'fs';
-import path from 'path';  
 
 const prisma = new PrismaClient();
 
@@ -13,31 +11,55 @@ const openai = new OpenAI({
 
 const JINA_URL = process.env.JINA_URL;
 const JINA_API_KEY = process.env.JINA_API_KEY;
+const SECRET = process.env.SECRET;
 
-export async function POST(request: Request) {
-  const parameters = await request.json();
-  parameters.webContent = [];
+interface ExerciseParameters {
+  tema: string;
+  quantidade: string;
+  nivel: string;
+  tipos: string[];
+  webContent?: any[];
+}
+
+// This type ensures that ExerciseParameters can be safely assigned to Prisma.InputJsonValue
+type SerializableExerciseParameters = {
+  [K in keyof ExerciseParameters]: ExerciseParameters[K] extends (infer U)[]
+    ? U extends object
+      ? string // Serialize arrays of objects to string
+      : ExerciseParameters[K]
+    : ExerciseParameters[K];
+};
+
+function serializeParameters(params: ExerciseParameters): SerializableExerciseParameters {
+  return {
+    ...params,
+    tipos: params.tipos,
+    webContent: params.webContent ? params.webContent : [],
+  };
+}
+
+async function handleAuthentication(request: Request): Promise<string | Response> {
   const token = request.headers.get("Token");
   if (!token) {
-    return new Response("Token não encontrado");
+    return new Response("Token não encontrado", { status: 401 });
   }
-  const secret = process.env.SECRET;
-  if (!secret) {
-    return new Response("Erro interno do servidor");
+  if (!SECRET) {
+    return new Response("Erro interno do servidor", { status: 500 });
   }
-  let id;
-  let decoded = await verifyJWT(token, secret);
+  const decoded = await verifyJWT(token, SECRET);
   if (typeof decoded === "object") {
-    id = decoded.id;
+    return decoded.id;
   }
+  return new Response("Token inválido", { status: 401 });
+}
 
+async function generateOptimizedQueries(parameters: ExerciseParameters): Promise<string[]> {
   const query = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
       {
         role: "system",
-        content:
-          "Você é um otimizador de querys, dado parametros crie 3 querys otimizadas para pequisas de em um mecanismo de busca como google a respeito do tema, faça cada query buscar um assunto diferente dentro do mesmo tema faça elas serem curtas com no maximo 10 palavras, responda em um formato semelhante a esse 'When%20was%20Jina%20AI%20founded%3F', De a query em portugues brasileiro. Elas devem estar em um JSON com a propridade querys que deve conter um array com apenas o texto das querys. Começa sempre com Exercicios sobre... ou Questões sobre... e coloque também o nível de escolaridade, por exemplo: Exercicios sobre matemática para ensino fundamental.",
+        content: "Você é um otimizador de querys. Dado parâmetros, crie 3 querys otimizadas para pesquisas em um mecanismo de busca como Google a respeito do tema. Faça cada query buscar um assunto diferente dentro do mesmo tema. Faça-as serem curtas com no máximo 10 palavras. Responda em português brasileiro. Elas devem estar em um JSON com a propriedade querys que deve conter um array com apenas o texto das querys. Comece sempre com 'Exercícios sobre...' ou 'Questões sobre...' e coloque também o nível de escolaridade, por exemplo: 'Exercícios sobre matemática para ensino fundamental'."
       },
       {
         role: "user",
@@ -53,45 +75,34 @@ export async function POST(request: Request) {
   });
 
   const querys = JSON.parse(query.choices[0].message.content ?? "");
+  return querys.querys.map((query: string) => query.replace(/ /g, "%20"));
+}
 
-  for (let i = 0; i < querys.querys.length; i++) {
-    querys.querys[i] = querys.querys[i].replace(/ /g, "%20");
-  }
+async function fetchWebContent(query: string): Promise<any[]> {
+  const busca = `${JINA_URL}${query}`;
+  console.log(busca);
 
-  // Executar os fetchs de forma assíncrona e esperar todos serem resolvidos
-  const fetchPromises = querys.querys.map(async (query: any) => {
-    const busca = `${JINA_URL}${query}`;
-    console.log(busca);
-
-    const webContent = await fetch(busca, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${JINA_API_KEY}`,
-        Accept: "application/json",
-        "X-Locale": "pt-BR",
-      },
-    });
-
-    const data = await webContent.json();
-    return [data.data[0], data.data[1], data.data[2]];
+  const webContent = await fetch(busca, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${JINA_API_KEY}`,
+      Accept: "application/json",
+      "X-Locale": "pt-BR",
+    },
   });
 
-  // Esperar que todas as requisições sejam resolvidas
-  const results = await Promise.all(fetchPromises);
+  const data = await webContent.json();
+  return [data.data[0], data.data[1], data.data[2]];
+}
 
-  // Adicionar os resultados ao parameters.webContent
-  results.forEach((result) => {
-    parameters.webContent.push(...result);
-  });
-
+async function generateExercises(parameters: ExerciseParameters): Promise<any> {
   const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     response_format: { type: "json_object" },
     messages: [
       {
         role: "system",
-        content:
-          'Você é um assistente de IA educacional projetado para gerar exercícios com base na entrada do usuário. Responda com um JSON contendo os exercícios solicitados, seguindo os parâmetros fornecidos. O parametro WebContent irá conter links de sites e seus respectivos conteúdos que devem conter exercicios sobre o tema, utilize desse contéudo para gerar os exercicios, De preferências para exercicios que estejam dentro do WebContent, e coloque juntamente do enunciado deles o seu link original. A resposta deve ser um JSON válido, sem quebras de linha ou outros caracteres especiais, e deve incluir um array chamado "questions". Cada item deste array deve conter os seguintes atributos: "question": O texto da pergunta. "type": O tipo de questão, que pode ser "alternativa" ou "dissertativa". Se o tipo for "alternativa", deve conter um objeto "options" com as propriedades "a", "b", "c", e "d", cada uma com o texto da respectiva alternativa. O item também deve conter um "correct_answer" com a letra da alternativa correta e uma "explanation" explicando por que essa resposta está correta. Se o tipo for "dissertativa", deve conter um "answer" com a resposta por extenso. Exemplo de JSON de saída: {"questions": [{"question": "Qual é a capital da França?","type": "alternativa","options": {"a": "Berlim","b": "Madrid","c": "Paris","d": "Lisboa"},"correct_answer": "c","explanation": "Paris é a capital da França."},{"question": "Explique o conceito de evolução segundo Darwin.","type": "dissertativa","answer": "A teoria da evolução de Darwin sugere que as espécies evoluem ao longo do tempo através de um processo de seleção natural."}]}. caso o exercicio tenha sua fonte como um dos sites do WebContent, coloque o link original do site na propriedade "source" do exercicio. Tome cuidado para nao criar alternativas muito grandes que possam exceder 120 caracteres',
+        content: "Você é um assistente de IA educacional projetado para gerar exercícios com base na entrada do usuário. Responda com um JSON contendo os exercícios solicitados, seguindo os parâmetros fornecidos. O parâmetro WebContent irá conter links de sites e seus respectivos conteúdos que devem conter exercícios sobre o tema. Utilize esse conteúdo para gerar os exercícios. Dê preferência para exercícios que estejam dentro do WebContent, e coloque juntamente do enunciado deles o seu link original. A resposta deve ser um JSON válido, sem quebras de linha ou outros caracteres especiais, e deve incluir um array chamado 'questions'. Cada item deste array deve conter os seguintes atributos: 'question': O texto da pergunta. 'type': O tipo de questão, que pode ser 'alternativa' ou 'dissertativa'. Se o tipo for 'alternativa', deve conter um objeto 'options' com as propriedades 'a', 'b', 'c', e 'd', cada uma com o texto da respectiva alternativa. O item também deve conter um 'correct_answer' com a letra da alternativa correta e uma 'explanation' explicando por que essa resposta está correta. Se o tipo for 'dissertativa', deve conter um 'answer' com a resposta por extenso. Caso o exercício tenha sua fonte como um dos sites do WebContent, coloque o link original do site na propriedade 'source' do exercício. Tome cuidado para não criar alternativas muito grandes que possam exceder 120 caracteres."
       },
       {
         role: "user",
@@ -105,143 +116,134 @@ export async function POST(request: Request) {
     presence_penalty: 0,
   });
 
-  const content = response.choices[0].message?.content;
-  let parsedContent;
-  if (content) {
-    parsedContent = JSON.parse(content);
-  }
-  const uuid = uuidv4();
+  return JSON.parse(response.choices[0].message?.content ?? "");
+}
 
+async function saveExercises(userId: string, parameters: ExerciseParameters, content: any): Promise<string> {
+  const uuid = uuidv4();
+  const serializedParams = serializeParameters(parameters);
   const savedContent = await prisma.exercises.create({
     data: {
       id: uuid,
       v: 1,
       date: new Date(),
-      params: parameters,
-      content: parsedContent,
+      params: serializedParams as Prisma.InputJsonValue,
+      content: content,
       author: {
-        connect: { id: id },
+        connect: { id: userId },
       },
     },
   });
-  return new Response(JSON.stringify({ id: savedContent.id }));
+  return savedContent.id;
+}
+
+export async function POST(request: Request) {
+  const userId = await handleAuthentication(request);
+  if (userId instanceof Response) return userId;
+
+  const parameters: ExerciseParameters = await request.json();
+  parameters.webContent = [];
+
+  const optimizedQueries = await generateOptimizedQueries(parameters);
+  const webContentPromises = optimizedQueries.map(fetchWebContent);
+  const webContentResults = await Promise.all(webContentPromises);
+  parameters.webContent = webContentResults.flat();
+
+  const exercises = await generateExercises(parameters);
+  const savedId = await saveExercises(userId, parameters, exercises);
+
+  return new Response(JSON.stringify({ id: savedId }));
 }
 
 export async function GET(request: Request) {
-  const token = request.headers.get("Token");
-  if (!token) {
-    return new Response("Token não encontrado");
-  }
-  const secret = process.env.SECRET;
-  if (!secret) {
-    return new Response("Erro interno do servidor");
-  }
-  let decoded = await verifyJWT(token, secret);
-  if (typeof decoded === "object") {
-    const exercises = await prisma.exercises.findMany({
-      where: {
-        authorId: decoded.id,
-      },
-    });
-    return new Response(JSON.stringify(exercises));
-  }
-  return new Response("Token inválido");
+  const userId = await handleAuthentication(request);
+  if (userId instanceof Response) return userId;
+
+  const exercises = await prisma.exercises.findMany({
+    where: { authorId: userId },
+  });
+
+  return new Response(JSON.stringify(exercises));
 }
 
 export async function PUT(request: Request) {
+  const userId = await handleAuthentication(request);
+  if (userId instanceof Response) return userId;
+
   const formData = await request.formData();
-  const token = request.headers.get("Token");
+  const parameters: ExerciseParameters = {
+    tema: formData.get("tema") as string,
+    quantidade: formData.get("quantidade") as string,
+    nivel: formData.get("nivel") as string,
+    tipos: JSON.parse(formData.get("tipos") as string),
+  };
 
-  if (!token) {
-    return new Response("Token não encontrado", { status: 401 });
-  }
+  const files: File[] = formData.getAll("files").filter((file): file is File => file instanceof File);
 
-  const secret = process.env.SECRET;
-  if (!secret) {
-    return new Response("Erro interno do servidor", { status: 500 });
-  }
-
-  // Extrair os parâmetros do FormData
-  const tema = formData.get("tema") as string;
-  const quantidade = formData.get("quantidade") as string;
-  const nivel = formData.get("nivel") as string;
-  const tipos = JSON.parse(formData.get("tipos") as string); // Parse JSON string to array
-
-  const files: File[] = [];
-  const uploadedFiles = formData.getAll("files"); // `files` is the key used in the frontend FormData
-
-  // Processar os arquivos (caso existam)
-  for (const file of uploadedFiles) {
-    if (file instanceof File) {
-      files.push(file);
-    }
-  }
-
-  // Verifica o token
-  let id;
-  let decoded = await verifyJWT(token, secret);
-  if (typeof decoded === "object") {
-    id = decoded.id;
-  }
-
-  // Cria o assistente e o vetor de armazenamento
-  let assistant = await openai.beta.assistants.create({
-    name: `${tema}_${id}`,
-    model: "gpt-4o-mini",
-    tools: [{ type: "file_search" }],
-    instructions: 'Você é um assistente de IA educacional projetado para gerar exercícios com base na entrada do usuário. Responda com um JSON contendo os exercícios solicitados, seguindo os parâmetros fornecidos. A resposta deve ser um JSON válido, sem quebras de linha ou outros caracteres especiais, e deve incluir um array chamado "questions". Cada item deste array deve conter os seguintes atributos: "question": O texto da pergunta. "type": O tipo de questão, que pode ser "alternativa" ou "dissertativa". Se o tipo for "alternativa", deve conter um objeto "options" com as propriedades "a", "b", "c", e "d", cada uma com o texto da respectiva alternativa. O item também deve conter um "correct_answer" com a letra da alternativa correta e uma "explanation" explicando por que essa resposta está correta. Se o tipo for "dissertativa", deve conter um "answer" com a resposta por extenso. Exemplo de JSON de saída: {"questions": [{"question": "Qual é a capital da França?","type": "alternativa","options": {"a": "Berlim","b": "Madrid","c": "Paris","d": "Lisboa"},"correct_answer": "c","explanation": "Paris é a capital da França."},{"question": "Explique o conceito de evolução segundo Darwin.","type": "dissertativa","answer": "A teoria da evolução de Darwin sugere que as espécies evoluem ao longo do tempo através de um processo de seleção natural."}]}. Tome cuidado para nao criar alternativas muito grandes que possam exceder 120 caracteres',
-  });
-
-  const vector_store = await openai.beta.vectorStores.create({ name: `${tema}_${id}` });
-  
-  // Fazer upload dos arquivos usando fileBatches
-  let filebatch = await openai.beta.vectorStores.fileBatches.uploadAndPoll(vector_store.id, { files });
-
-  while (filebatch.status !== "completed") {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    filebatch = await openai.beta.vectorStores.fileBatches.retrieve(vector_store.id, filebatch.id);
-  }
-
-  assistant = await openai.beta.assistants.update(assistant.id, {
-    tool_resources: { "file_search": { "vector_store_ids": [vector_store.id] } }
-  });
+  const assistant = await createAssistant(userId, parameters.tema);
+  const vectorStore = await createVectorStore(userId, parameters.tema);
+  await uploadFiles(vectorStore.id, files);
+  await updateAssistant(assistant.id, vectorStore.id);
 
   const thread = await openai.beta.threads.create();
+  await sendMessageToThread(thread.id, parameters);
+  const run = await createAndWaitForRun(thread.id, assistant.id);
 
-  const parameters = { tema, quantidade, nivel, tipos }; // Dados do formulário
-  const message = await openai.beta.threads.messages.create(thread.id, {
-    role: "user",
-    content: JSON.stringify(parameters),
-  });
-
-  const run = await openai.beta.threads.runs.create(thread.id, {
-    assistant_id: assistant.id,
-  });
-
-  let retrieveRun = await openai.beta.threads.runs.retrieve(run.thread_id, run.id);
-
-  while (retrieveRun.status !== "completed") {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    retrieveRun = await openai.beta.threads.runs.retrieve(run.thread_id, run.id);
-  }
-
-  if (retrieveRun.status === "completed") {
-    const messages = await openai.beta.threads.messages.list(thread.id);
-    const content = (messages as any).body.data[0].content[0].text.value;
-    const parsedContent = JSON.parse(content);
-    const uuid = uuidv4();
-    const savedContent = await prisma.exercises.create({
-      data: {
-        id: uuid,
-        v: 1,
-        date: new Date(),
-        params: parameters,
-        content: parsedContent,
-      }
-    });
-    return new Response(JSON.stringify({ id: savedContent.id }));
+  if (run.status === "completed") {
+    const content = await getCompletedRunContent(thread.id);
+    const savedId = await saveExercises(userId, parameters, content);
+    return new Response(JSON.stringify({ id: savedId }));
   }
 
   return new Response("Erro interno do servidor", { status: 500 });
 }
 
+async function createAssistant(userId: string, tema: string) {
+  return await openai.beta.assistants.create({
+    name: `${tema}_${userId}`,
+    model: "gpt-4o-mini",
+    tools: [{ type: "file_search" }],
+    instructions: 'Você é um assistente de IA educacional projetado para gerar exercícios com base na entrada do usuário. Responda com um JSON contendo os exercícios solicitados, seguindo os parâmetros fornecidos. A resposta deve ser um JSON válido, sem quebras de linha ou outros caracteres especiais, e deve incluir um array chamado "questions". Cada item deste array deve conter os seguintes atributos: "question": O texto da pergunta. "type": O tipo de questão, que pode ser "alternativa" ou "dissertativa". Se o tipo for "alternativa", deve conter um objeto "options" com as propriedades "a", "b", "c", e "d", cada uma com o texto da respectiva alternativa. O item também deve conter um "correct_answer" com a letra da alternativa correta e uma "explanation" explicando por que essa resposta está correta. Se o tipo for "dissertativa", deve conter um "answer" com a resposta por extenso. Tome cuidado para não criar alternativas muito grandes que possam exceder 120 caracteres',
+  });
+}
+
+async function createVectorStore(userId: string, tema: string) {
+  return await openai.beta.vectorStores.create({ name: `${tema}_${userId}` });
+}
+
+async function uploadFiles(vectorStoreId: string, files: File[]) {
+  let fileBatch = await openai.beta.vectorStores.fileBatches.uploadAndPoll(vectorStoreId, { files });
+  while (fileBatch.status !== "completed") {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    fileBatch = await openai.beta.vectorStores.fileBatches.retrieve(vectorStoreId, fileBatch.id);
+  }
+}
+
+async function updateAssistant(assistantId: string, vectorStoreId: string) {
+  return await openai.beta.assistants.update(assistantId, {
+    tool_resources: { "file_search": { "vector_store_ids": [vectorStoreId] } }
+  });
+}
+
+async function sendMessageToThread(threadId: string, parameters: ExerciseParameters) {
+  await openai.beta.threads.messages.create(threadId, {
+    role: "user",
+    content: JSON.stringify(parameters),
+  });
+}
+
+async function createAndWaitForRun(threadId: string, assistantId: string) {
+  const run = await openai.beta.threads.runs.create(threadId, { assistant_id: assistantId });
+  let retrieveRun = await openai.beta.threads.runs.retrieve(run.thread_id, run.id);
+  while (retrieveRun.status !== "completed") {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    retrieveRun = await openai.beta.threads.runs.retrieve(run.thread_id, run.id);
+  }
+  return retrieveRun;
+}
+
+async function getCompletedRunContent(threadId: string) {
+  const messages = await openai.beta.threads.messages.list(threadId);
+  const content = (messages as any).body.data[0].content[0].text.value;
+  return JSON.parse(content);
+}

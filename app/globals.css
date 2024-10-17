@@ -56,13 +56,6 @@
   box-shadow: 2px 0px 15px 0px rgba(0, 0, 0, 0.25);
 }
 
-.box-4 {
-  @apply text-zinc-900;
-  border-radius: 30px;
-  box-shadow: 2px 0px 15px 0px rgba(0, 0, 0, 0.25);
-  
-}
-
 .box-1 {
   @apply box;
   background: linear-gradient(128deg, #e6d604 -3.28%, #b45c0b 98.55%);
@@ -71,11 +64,6 @@
 .box-2 {
   @apply box;
   background: linear-gradient(179deg, #c6a4f5 -4.36%, #4d2c4e 111.92%);
-}
-
-.btn-gradient{
-  background: linear-gradient(70deg, #c6a4f5 -4.36%, #4d2c4e 111.92%);
-  @apply text-zinc-100
 }
 
 .box-3 {
@@ -88,6 +76,16 @@
   );
 }
 
+.box-4 {
+  @apply text-zinc-900;
+  border-radius: 30px;
+  box-shadow: 2px 0px 15px 0px rgba(0, 0, 0, 0.25);
+  
+}
+.btn-gradient{
+  background: linear-gradient(70deg, #c6a4f5 -4.36%, #4d2c4e 111.92%);
+  @apply text-zinc-100
+}
 .gradient-divider{
   background: linear-gradient(
     220deg,
