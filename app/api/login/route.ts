@@ -1,48 +1,62 @@
-import { generateJWT } from '@/lib/util';
-import { decrypt } from '@/lib/util';
+import { generateJWT, decrypt } from '@/lib/util';
 import { PrismaClient } from '@prisma/client';
-
 
 const prisma = new PrismaClient();
 
+const ERROR_MESSAGES = {
+    MISSING_FIELDS: "Preencha todos os campos corretamente",
+    USER_NOT_FOUND: "Usuário não existente",
+    INVALID_PASSWORD: "Senha inválida",
+    INTERNAL_ERROR: "Erro interno",
+    SECRET_NOT_DEFINED: "Erro: variável de ambiente SECRET não definida",
+};
 
-export async function POST (request : Request){
-    const formData = await request.formData();
-    const result = await loginUser(formData);
-    if (typeof result === 'string') {
-        return new Response(result);
+export async function POST(request: Request) {
+    try {
+        const formData = await request.formData();
+        const result = await loginUser(formData);
+        return new Response(JSON.stringify(result), { status: result.success ? 200 : 400 });
+    } catch (error) {
+        return new Response(ERROR_MESSAGES.INTERNAL_ERROR, { status: 500 });
     }
-    return new Response(JSON.stringify(result))
 }
 
-
 async function loginUser(formData: FormData) {
-    const email = formData.get('email')?.toString?.();
-    const password = formData.get('password')?.toString?.();
+    const { email, password } = extractCredentials(formData);
     if (!email || !password) {
-
-        return "Preencha todos os campos corretamente";
+        return { success: false, message: ERROR_MESSAGES.MISSING_FIELDS };
     }
-    const user = await prisma.users.findUnique({
-        where: {
-            email: email
-        }
-    });
+
+    const user = await findUserByEmail(email);
     if (!user) {
-
-        return "Usuário não existente";
+        return { success: false, message: ERROR_MESSAGES.USER_NOT_FOUND };
     }
-    const result = await decrypt(password, user.password);
-    if (!result) {
 
-        return "Senha inválida";
+    const isPasswordValid = await validatePassword(password, user.password);
+    if (!isPasswordValid) {
+        return { success: false, message: ERROR_MESSAGES.INVALID_PASSWORD };
     }
-    const secret = String(process.env.SECRET);
 
+    const secret = process.env.SECRET;
     if (!secret) {
-
-        return "Erro interno";
+        return { success: false, message: ERROR_MESSAGES.SECRET_NOT_DEFINED };
     }
+
     const jwtToken = await generateJWT(user.id, secret);
-    return {token: jwtToken, message: "Sucesso ao realizar login"};
+    return { success: true, token: jwtToken, message: "Sucesso ao realizar login" };
+}
+
+function extractCredentials(formData: FormData) {
+    return {
+        email: formData.get('email')?.toString(),
+        password: formData.get('password')?.toString(),
+    };
+}
+
+async function findUserByEmail(email: string) {
+    return await prisma.users.findUnique({ where: { email } });
+}
+
+async function validatePassword(password: string, hashedPassword: string) {
+    return await decrypt(password, hashedPassword);
 }
