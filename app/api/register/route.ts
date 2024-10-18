@@ -16,6 +16,7 @@ async function encrypt(password: string, salts: number): Promise<string> {
     const encryptedPassword = bcrypt.hashSync(password, salts);
     return encryptedPassword;
 }
+
 async function registerUser(formData: FormData) {
     const name = formData.get('name');
     const email = formData.get('email');
