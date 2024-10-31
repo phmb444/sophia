@@ -50,6 +50,7 @@ export default function Chat() {
     const newChatId = uuidv4();
     setSelectedChatId(newChatId);
     setMessages([]);
+    setChatTitle('New Chat');
   }, [setMessages]);
 
   useEffect(() => {
