@@ -1,44 +1,25 @@
-// app/api/chat/route.ts
 import { verifyJWT } from "@/lib/util";
 import { PrismaClient } from "@prisma/client";
 import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 
-
 const prisma = new PrismaClient();
 const SECRET = process.env.SECRET;
 
-async function handleAuthentication(
-  request: Request
-): Promise<string | Response> {
+async function authenticateUser(request: Request): Promise<string | Response> {
   const token = request.headers.get("Token");
-  if (!token) {
-    return new Response("Token não encontrado", { status: 401 });
-  }
-  if (!SECRET) {
-    return new Response("Erro interno do servidor", { status: 500 });
-  }
+  if (!token) return new Response("Token não encontrado", { status: 401 });
+  if (!SECRET) return new Response("Erro interno do servidor", { status: 500 });
+
   const decoded = await verifyJWT(token, SECRET);
-  if (typeof decoded === "object") {
-    return decoded.id;
-  }
-  return new Response("Token inválido", { status: 401 });
+  return typeof decoded === "object" ? decoded.id : new Response("Token inválido", { status: 401 });
 }
 
-async function saveChatMessage(
-  userId: string,
-  chatId: string,
-  messages: { role: string; content: string }[]
-): Promise<string> {
-  if (!chatId) {
-    throw new Error("Chat ID is required");
-  }
+async function saveChatMessage(userId: string, chatId: string, messages: { role: string; content: string }[]): Promise<string> {
+  if (!chatId) throw new Error("Chat ID is required");
 
   const existingChat = await prisma.chat.findUnique({
-    where: {
-      id: chatId,
-      authorId: userId,
-    },
+    where: { id: chatId, authorId: userId },
   });
 
   if (existingChat) {
@@ -56,29 +37,22 @@ async function saveChatMessage(
       date: new Date(),
       params: {},
       content: messages,
-      author: {
-        connect: { id: userId },
-      },
+      author: { connect: { id: userId } },
     },
   });
   return chatId;
 }
 
-export async function POST(req: Request) {
+async function handleChatPost(req: Request) {
   const { messages, chat_id } = await req.json();
-  console.log(chat_id, messages);
+  const userIdOrResponse = await authenticateUser(req);
+  if (typeof userIdOrResponse !== "string") return userIdOrResponse;
 
-  const userIdOrResponse = await handleAuthentication(req);
-  if (typeof userIdOrResponse !== "string") {
-    return userIdOrResponse;
-  }
   const userId = userIdOrResponse;
-
   const model = openai("gpt-4o-mini");
 
   const result = await streamText({
-    system:
-      "Seu nome é Sophia, um assistente educacional baseado em inteligência artificial",
+    system: "Seu nome é Sophia, um assistente educacional baseado em inteligência artificial",
     model,
     messages,
     maxTokens: 1024,
@@ -92,14 +66,12 @@ export async function POST(req: Request) {
   return result.toDataStreamResponse();
 }
 
-export async function GET(req: Request) {
+async function handleChatGet(req: Request) {
   const url = new URL(req.url);
   const chatId = url.searchParams.get("chat_id");
+  const userIdOrResponse = await authenticateUser(req);
+  if (typeof userIdOrResponse !== "string") return userIdOrResponse;
 
-  const userIdOrResponse = await handleAuthentication(req);
-  if (typeof userIdOrResponse !== "string") {
-    return userIdOrResponse;
-  }
   const userId = userIdOrResponse;
 
   if (chatId) {
@@ -108,39 +80,29 @@ export async function GET(req: Request) {
       include: { author: true },
     });
 
-    if (!chat) {
-      return new Response("Chat not found", { status: 404 });
-    }
-
-    return new Response(JSON.stringify(chat.content), {
-      headers: { "Content-Type": "application/json" },
-    });
+    if (!chat) return new Response("Chat not found", { status: 404 });
+    return new Response(JSON.stringify(chat.content), { headers: { "Content-Type": "application/json" } });
   }
 
   const chats = await prisma.chat.findMany({
     where: { authorId: userId },
     orderBy: { date: "desc" },
-    take: 10,
-    select: {
-      id: true,
-      date: true,
-      content: true,
-    },
+    select: { id: true, date: true, content: true },
   });
 
-  const chatSummaries = chats.map((chat) => {
-    const firstMessage =
-      Array.isArray(chat.content) && chat.content.length > 0
-        ? chat.content[0]
-        : "";
-    return {
-      id: chat.id,
-      date: chat.date,
-      firstMessage,
-    };
-  });
+  const chatSummaries = chats.map((chat) => ({
+    id: chat.id,
+    date: chat.date,
+    firstMessage: Array.isArray(chat.content) && chat.content.length > 0 ? chat.content[0] : "",
+  }));
 
-  return new Response(JSON.stringify(chatSummaries), {
-    headers: { "Content-Type": "application/json" },
-  });
+  return new Response(JSON.stringify(chatSummaries), { headers: { "Content-Type": "application/json" } });
+}
+
+export async function POST(req: Request) {
+  return handleChatPost(req);
+}
+
+export async function GET(req: Request) {
+  return handleChatGet(req);
 }

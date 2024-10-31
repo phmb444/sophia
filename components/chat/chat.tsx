@@ -2,7 +2,10 @@
 
 import { Message, useChat } from 'ai/react';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { v4 as uuidv4 } from 'uuid'; // Add this import
+import { v4 as uuidv4 } from 'uuid';
+import ChatHistory from './ChatHistory';
+import MessageList from './MessageList';
+import { Input, Button } from '@nextui-org/react';
 
 export default function Chat() {
   const [token, setToken] = useState<string | null>(null);
@@ -12,10 +15,12 @@ export default function Chat() {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   };
 
   const {data, messages, input, handleInputChange, handleSubmit, isLoading: isSubmitting, reload, setMessages } = useChat({
@@ -29,16 +34,9 @@ export default function Chat() {
         fetch('/api/chat', {
           headers: { Token: token },
         })
-          .then(res => {
-            console.log(res.statusText);
-            const headers = res.headers;
-            headers.forEach((value, key) => {
-              console.log(`${key}: ${value}`);
-            });
-            return res.json().then(data => {
-              setChatHistory(data);
-            });
-          })
+          .then(res => res.json().then(data => {
+            setChatHistory(data);
+          }))
           .catch(err => setError(err.message));
       }
     },
@@ -50,8 +48,7 @@ export default function Chat() {
   const handleNewChat = useCallback(() => {
     const newChatId = uuidv4();
     setSelectedChatId(newChatId);
-    setMessages([]); // Clear existing messages
-    // Optionally, you can fetch or initialize the new chat as needed
+    setMessages([]);
   }, [setMessages]);
 
   useEffect(() => {
@@ -84,10 +81,8 @@ export default function Chat() {
       handleNewChat();
   },[handleNewChat]);
 
-  
-
   useEffect(() => {
-    scrollToBottom();
+    scrollToBottom(); // Scroll to bottom whenever messages change
   }, [messages]);
 
   const handleChatSelect = async (id: string) => {
@@ -114,61 +109,19 @@ export default function Chat() {
     }
   };
 
-  
-
   return (
     <div style={{
       display: 'flex',
       height: '90vh',
       overflow: 'hidden'
     }}>
-      {/* Sidebar com histórico */}
-      <div style={{
-        width: '30%',
-        border: '1px solid #ccc',
-        padding: '1rem',
-        overflowY: 'auto',
-        backgroundColor: '#f5f5f5',
-        height: '90vh'
-      }}>
-        <button onClick={handleNewChat} style={{
-          marginBottom: '1rem',
-          padding: '0.5rem 1rem',
-          backgroundColor: '#3b82f6',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer'
-        }}>
-          New Chat
-        </button>
-        {isLoadingHistory ? (
-          <div style={{ textAlign: 'center', padding: '1rem' }}>Loading chats...</div>
-        ) : (
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {chatHistory.map(chat => (
-              <li
-                key={chat.id}
-                onClick={() => !isSubmitting && handleChatSelect(chat.id)}
-                style={{
-                  padding: '0.75rem',
-                  marginBottom: '0.5rem',
-                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                  backgroundColor: selectedChatId === chat.id ? '#e0e0e0' : 'white',
-                  borderRadius: '4px',
-                  transition: 'background-color 0.2s',
-                  opacity: isSubmitting ? 0.7 : 1,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                }}
-              >
-                {chat.firstMessage.content}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* Chat principal */}
+      <ChatHistory 
+        chatHistory={chatHistory} 
+        selectedChatId={selectedChatId || ""} 
+        onChatSelect={handleChatSelect} 
+        isSubmitting={isSubmitting} 
+        onNewChat={handleNewChat} 
+      />
       <div style={{
         width: '70%',
         height: '90vh',
@@ -187,40 +140,16 @@ export default function Chat() {
             {error}
           </div>
         )}
-
-        {/* Área de mensagens */}
-        <div style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '1rem',
-          marginBottom: '80px',
-        }}>
-          {isLoadingMessages ? (
-            <div style={{ textAlign: 'center', padding: '1rem' }}>Loading messages...</div>
-          ) : (
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {messages.map((m, index) => (
-                <li
-                  key={index}
-                  style={{
-                    padding: '0.75rem',
-                    marginBottom: '0.5rem',
-                    backgroundColor: m.role === 'user' ? '#f0f9ff' : '#f8f9fa',
-                    borderRadius: '4px',
-                    maxWidth: '80%',
-                    marginLeft: m.role === 'user' ? 'auto' : '0'
-                  }}
-                >
-                  <strong>{m.role === 'user' ? 'You: ' : 'AI: '}</strong>
-                  {m.content}
-                </li>
-              ))}
-              <div ref={messagesEndRef} />
-            </ul>
-          )}
+        <div 
+          ref={messagesContainerRef} 
+          style={{ 
+            flex: 1, 
+            overflowY: 'auto', 
+            padding: '1rem' 
+          }}
+        >
+          <MessageList messages={messages} isLoadingMessages={isLoadingMessages} />
         </div>
-
-        {/* Formulário fixo na parte inferior */}
         <div style={{
           position: 'absolute',
           bottom: 0,
@@ -234,39 +163,30 @@ export default function Chat() {
             display: 'flex',
             gap: '1rem',
           }}>
-            <input
+            <Input
               value={input}
               onChange={handleInputChange}
               disabled={isSubmitting}
               placeholder="Type your message..."
-              style={{
-                flex: 1,
-                padding: '0.75rem',
-                borderRadius: '4px',
-                border: '1px solid #ccc',
-                outline: 'none'
-              }}
+              style={{ flex: 1 }}
             />
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
               style={{
                 padding: '0.75rem 1.5rem',
                 backgroundColor: isSubmitting ? '#9ca3af' : '#3b82f6',
                 color: 'white',
-                border: 'none',
                 borderRadius: '4px',
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
                 transition: 'background-color 0.2s'
               }}
             >
               {isSubmitting ? 'Sending...' : 'Send'}
-            </button>
+            </Button>
           </form>
         </div>
       </div>
     </div>
   );
 }
-
-
