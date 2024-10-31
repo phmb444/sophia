@@ -17,6 +17,7 @@ model users {
   exercises exercises[]
   roteiros roteiros[]
   correcao correcao[]
+  chat chat[]
 }
 
 model exercises {
@@ -40,6 +41,16 @@ model roteiros {
 }
 
 model correcao {
+  id String @id @map("_id")
+  v  Int    @map("__v")
+  date DateTime @db.Date
+  params Json
+  author users? @relation(fields: [authorId], references: [id])
+  authorId String?
+  content Json
+}
+
+model chat{
   id String @id @map("_id")
   v  Int    @map("__v")
   date DateTime @db.Date
