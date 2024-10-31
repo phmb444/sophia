@@ -49,7 +49,7 @@ async function saveChatMessage(userId: string, chatId: string, messages: { role:
 async function generateChatTitle(messages: { role: string; content: string }[]): Promise<string> {
   const model = openai("gpt-4o-mini");
   const {text} = await generateText({
-    system: "dado um conjunto de mensagens, gerar um título curto para o chat",
+    system: "dado um conjunto de mensagens, gerar um título curto para o chat, nao utilize de markdown nem de '' ou `` para começar e terminar o texto, apenas o texto com pontuação normal, também não coloque sophia no titulo dos textos gerados, coloque apenas sobre o que se trata a conversa",
     model,
     prompt: messages.map((m) => `${m.role === "user" ? "Você" : "Sophia"}: ${m.content}`).join("\n"),
   });
