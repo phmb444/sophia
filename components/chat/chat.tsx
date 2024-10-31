@@ -9,11 +9,12 @@ import { Input, Button } from '@nextui-org/react';
 
 export default function Chat() {
   const [token, setToken] = useState<string | null>(null);
-  const [chatHistory, setChatHistory] = useState<{ id: string; firstMessage: { content: string, role: string } }[]>([]);
+  const [chatHistory, setChatHistory] = useState<{ id: string, date: string, title: string }[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [chatTitle, setChatTitle] = useState<string | null>(null);
 
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -23,7 +24,7 @@ export default function Chat() {
     }
   };
 
-  const {data, messages, input, handleInputChange, handleSubmit, isLoading: isSubmitting, reload, setMessages } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading: isSubmitting, reload, setMessages } = useChat({
     api: '/api/chat',
     body: { chat_id: selectedChatId },
     headers: { Token: token as string },
@@ -98,8 +99,9 @@ export default function Chat() {
 
       if (!res.ok) throw new Error('Failed to load messages');
 
-      const data: Message[] = await res.json();
-      setMessages(data);
+      const data: { messages: Message[], title: string } = await res.json();
+      setMessages(data.messages);
+      setChatTitle(data.title); // Set the chat title
       reload();
       setError(null);
     } catch (err: any) {
@@ -140,6 +142,19 @@ export default function Chat() {
             {error}
           </div>
         )}
+        {chatTitle && (
+          <div style={{
+            padding: '0.75rem',
+            backgroundColor: '#f0f0f0',
+            color: '#333',
+            borderRadius: '4px',
+            margin: '1rem',
+            textAlign: 'center',
+            fontWeight: 'bold'
+          }}>
+            {chatTitle}
+          </div>
+        )}
         <div 
           ref={messagesContainerRef} 
           style={{ 
@@ -172,15 +187,8 @@ export default function Chat() {
             />
             <Button
               type="submit"
-              disabled={isSubmitting}
-              style={{
-                padding: '0.75rem 1.5rem',
-                backgroundColor: isSubmitting ? '#9ca3af' : '#3b82f6',
-                color: 'white',
-                borderRadius: '4px',
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                transition: 'background-color 0.2s'
-              }}
+              isLoading={isSubmitting}
+              color='primary'
             >
               {isSubmitting ? 'Sending...' : 'Send'}
             </Button>

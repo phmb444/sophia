@@ -1,6 +1,6 @@
 import { verifyJWT } from "@/lib/util";
 import { PrismaClient } from "@prisma/client";
-import { streamText } from "ai";
+import { generateText, streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 
 const prisma = new PrismaClient();
@@ -18,6 +18,8 @@ async function authenticateUser(request: Request): Promise<string | Response> {
 async function saveChatMessage(userId: string, chatId: string, messages: { role: string; content: string }[]): Promise<string> {
   if (!chatId) throw new Error("Chat ID is required");
 
+  const title = await generateChatTitle(messages); // Function to generate chat title
+
   const existingChat = await prisma.chat.findUnique({
     where: { id: chatId, authorId: userId },
   });
@@ -25,7 +27,7 @@ async function saveChatMessage(userId: string, chatId: string, messages: { role:
   if (existingChat) {
     await prisma.chat.update({
       where: { id: chatId },
-      data: { content: messages },
+      data: { content: messages, title }, // Update title
     });
     return chatId;
   }
@@ -37,10 +39,21 @@ async function saveChatMessage(userId: string, chatId: string, messages: { role:
       date: new Date(),
       params: {},
       content: messages,
+      title, // Set title
       author: { connect: { id: userId } },
     },
   });
   return chatId;
+}
+
+async function generateChatTitle(messages: { role: string; content: string }[]): Promise<string> {
+  const model = openai("gpt-4o-mini");
+  const {text} = await generateText({
+    system: "dado um conjunto de mensagens, gerar um título curto para o chat",
+    model,
+    prompt: messages.map((m) => `${m.role === "user" ? "Você" : "Sophia"}: ${m.content}`).join("\n"),
+  });
+  return text;
 }
 
 async function handleChatPost(req: Request) {
@@ -81,19 +94,19 @@ async function handleChatGet(req: Request) {
     });
 
     if (!chat) return new Response("Chat not found", { status: 404 });
-    return new Response(JSON.stringify(chat.content), { headers: { "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ messages: chat.content, title: chat.title }), { headers: { "Content-Type": "application/json" } });
   }
 
   const chats = await prisma.chat.findMany({
     where: { authorId: userId },
     orderBy: { date: "desc" },
-    select: { id: true, date: true, content: true },
+    select: { id: true, date: true, content: true, title: true },
   });
 
   const chatSummaries = chats.map((chat) => ({
     id: chat.id,
     date: chat.date,
-    firstMessage: Array.isArray(chat.content) && chat.content.length > 0 ? chat.content[0] : "",
+    title: chat.title,
   }));
 
   return new Response(JSON.stringify(chatSummaries), { headers: { "Content-Type": "application/json" } });

@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: string;
@@ -12,30 +13,26 @@ interface MessageListProps {
 
 const MessageList: React.FC<MessageListProps> = ({ messages, isLoadingMessages }) => {
   return (
-    <div style={{
-      flex: 1,
-      overflowY: 'auto',
-      padding: '1rem',
-      marginBottom: '80px',
-    }}>
+    <div className="flex-1 overflow-y-auto p-4 mb-20">
       {isLoadingMessages ? (
-        <div style={{ textAlign: 'center', padding: '1rem' }}>Loading messages...</div>
+        <div className="text-center p-4">Loading messages...</div>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        <ul className="list-none p-0 m-0">
           {messages.map((m, index) => (
             <li
               key={index}
-              style={{
-                padding: '0.75rem',
-                marginBottom: '0.5rem',
-                backgroundColor: m.role === 'user' ? '#f0f9ff' : '#f8f9fa',
-                borderRadius: '4px',
-                maxWidth: '80%',
-                marginLeft: m.role === 'user' ? 'auto' : '0'
-              }}
+              className={`p-3 mb-2 rounded-xl max-w-4/5 ${m.role === 'user' ? 'bg-blue-100 ml-[30vw]' : 'bg-gray-100 mr-[20vw]'}`}
             >
-              <strong>{m.role === 'user' ? 'You: ' : 'AI: '}</strong>
-              {m.content}
+              {m.role === 'user' ? (
+                <p className="font-bold text-black">
+                  Você:{' '}
+                </p>
+              ) : (
+                <p className="font-bold w-fit bg-gradient-to-r from-amber-400 via-pink-500 to-purple-500 text-transparent bg-clip-text">
+                  Sophia:{' '}
+                </p>
+              )}
+              <ReactMarkdown>{m.content}</ReactMarkdown>
             </li>
           ))}
         </ul>

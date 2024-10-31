@@ -50,7 +50,7 @@ model correcao {
   content Json
 }
 
-model chat{
+model chat {
   id String @id @map("_id")
   v  Int    @map("__v")
   date DateTime @db.Date
@@ -58,6 +58,7 @@ model chat{
   author users? @relation(fields: [authorId], references: [id])
   authorId String?
   content Json
+  title String // New field for chat title
 }
 
 

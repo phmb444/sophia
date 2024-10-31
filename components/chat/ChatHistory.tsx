@@ -1,10 +1,10 @@
+import { useState } from 'react';
 import { Button } from '@nextui-org/react';
 
 interface Chat {
+  title: string;
   id: string;
-  firstMessage: {
-    content: string;
-  };
+  date: string;
 }
 
 interface ChatHistoryProps {
@@ -15,39 +15,57 @@ interface ChatHistoryProps {
   onNewChat: () => void;
 }
 
-const ChatHistory: React.FC<ChatHistoryProps> = ({ chatHistory, selectedChatId, onChatSelect, isSubmitting, onNewChat }) => {
+const ChatHistory: React.FC<ChatHistoryProps> = ({
+  chatHistory,
+  selectedChatId,
+  onChatSelect,
+  isSubmitting,
+  onNewChat,
+}) => {
+  const [visibleChats, setVisibleChats] = useState(10);
+
+  const handleLoadMore = () => {
+    setVisibleChats((prev) => prev + 10);
+  };
+
+  const displayedChats = chatHistory.slice(0, visibleChats);
+
   return (
-    <div style={{
-      width: '30%',
-      border: '1px solid #ccc',
-      padding: '1rem',
-      overflowY: 'auto',
-      backgroundColor: '#f5f5f5',
-      height: '90vh' // Ensure the height allows for scrolling
-    }}>
-      <Button onClick={onNewChat} style={{ marginBottom: '1rem' }}>
+    <div className="w-1/3 border border-gray-300 p-4 overflow-y-auto bg-gray-100 h-[90vh]">
+      <Button color='secondary' onClick={onNewChat} className="mb-4 w-full">
         New Chat
       </Button>
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-        {chatHistory.map(chat => (
-          <li
-            key={chat.id}
-            onClick={() => !isSubmitting && onChatSelect(chat.id)}
-            style={{
-              padding: '0.75rem',
-              marginBottom: '0.5rem',
-              cursor: isSubmitting ? 'not-allowed' : 'pointer',
-              backgroundColor: selectedChatId === chat.id ? '#e0e0e0' : 'white',
-              borderRadius: '4px',
-              transition: 'background-color 0.2s',
-              opacity: isSubmitting ? 0.7 : 1,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-            }}
-          >
-            {chat.firstMessage.content}
-          </li>
-        ))}
-      </ul>
+      {chatHistory.length === 0 ? (
+        <div className="text-center text-xl bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 bg-clip-text text-transparent animate-pulse">
+          Carregando...
+        </div>
+      ) : (
+        <>
+          <ul className="list-none p-0 m-0">
+            {displayedChats.map((chat) => (
+                <li
+                key={chat.id}
+                onClick={() => !isSubmitting && onChatSelect(chat.id)}
+                className={`py-3 px-3 mb-2 cursor-${
+                  isSubmitting ? 'not-allowed' : 'pointer'
+                } ${
+                  selectedChatId === chat.id ? 'bg-gray-300' : 'bg-white'
+                } rounded transition-colors duration-200 opacity-${isSubmitting ? '70' : '100'} shadow-sm`}
+                >
+                {chat.title}
+                <div className="text-gray-500 text-sm mt-1">
+                  {new Date(chat.date).toLocaleDateString('pt-BR')}
+                </div>
+                </li>
+            ))}
+          </ul>
+          {visibleChats < chatHistory.length && (
+            <Button onClick={handleLoadMore} className="mt-4 w-full">
+              Ver Mais
+            </Button>
+          )}
+        </>
+      )}
     </div>
   );
 };
