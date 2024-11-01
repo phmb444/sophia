@@ -1,5 +1,9 @@
-import Chat from "@/components/chat/chat"
+import Chat from "@/components/chat/chat";
 
 export default function Page() {
-  return <Chat />
+  return (
+    <div className="p-4">
+      <Chat />
+    </div>
+  );
 }

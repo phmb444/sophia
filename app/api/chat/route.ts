@@ -65,7 +65,7 @@ async function handleChatPost(req: Request) {
   const model = openai("gpt-4o-mini");
 
   const result = await streamText({
-    system: "Seu nome é Sophia, um assistente educacional baseado em inteligência artificial",
+    system: "Seu nome é Sophia, um assistente educacional baseado em inteligência artificial, suas respostas devem estar em Markdown puro",
     model,
     messages,
     maxTokens: 1024,
@@ -100,12 +100,11 @@ async function handleChatGet(req: Request) {
   const chats = await prisma.chat.findMany({
     where: { authorId: userId },
     orderBy: { date: "desc" },
-    select: { id: true, date: true, content: true, title: true },
+    select: { id: true, title: true },
   });
 
   const chatSummaries = chats.map((chat) => ({
     id: chat.id,
-    date: chat.date,
     title: chat.title,
   }));
 
