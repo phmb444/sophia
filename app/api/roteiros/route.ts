@@ -45,17 +45,25 @@ async function generateOptimizedQueries(parameters: any): Promise<string[]> {
 
 // Função auxiliar para buscar conteúdo da web usando as querys geradas
 async function fetchWebContent(query: string): Promise<any[]> {
-  const response = await fetch(`${JINA_URL}${query}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${JINA_API_KEY}`,
-      Accept: "application/json",
-      "X-Locale": "pt-BR",
-    },
-  });
+  try {
+    const busca = `${JINA_URL}${query}`;
+    console.log(busca);
 
-  const data = await response.json();
-  return [data.data[0], data.data[1], data.data[2]];
+    const webContent = await fetch(busca, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${JINA_API_KEY}`,
+        Accept: "application/json",
+        "X-Locale": "pt-BR",
+      },
+    });
+
+    const data = await webContent.json();
+    return [data.data[0], data.data[1], data.data[2]];
+  } catch (error) {
+    console.error(`Erro ao buscar conteúdo web para a query "${query}":`, error);
+    return [];
+  }
 }
 
 // Função para criar roteiro baseado em parâmetros e conteúdo da web

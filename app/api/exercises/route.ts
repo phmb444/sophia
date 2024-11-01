@@ -79,20 +79,25 @@ async function generateOptimizedQueries(parameters: ExerciseParameters): Promise
 }
 
 async function fetchWebContent(query: string): Promise<any[]> {
-  const busca = `${JINA_URL}${query}`;
-  console.log(busca);
+  try {
+    const busca = `${JINA_URL}${query}`;
+    console.log(busca);
 
-  const webContent = await fetch(busca, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${JINA_API_KEY}`,
-      Accept: "application/json",
-      "X-Locale": "pt-BR",
-    },
-  });
+    const webContent = await fetch(busca, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${JINA_API_KEY}`,
+        Accept: "application/json",
+        "X-Locale": "pt-BR",
+      },
+    });
 
-  const data = await webContent.json();
-  return [data.data[0], data.data[1], data.data[2]];
+    const data = await webContent.json();
+    return [data.data[0], data.data[1], data.data[2]];
+  } catch (error) {
+    console.error(`Erro ao buscar conteúdo web para a query "${query}":`, error);
+    return [];
+  }
 }
 
 async function generateExercises(parameters: ExerciseParameters): Promise<any> {
