@@ -162,46 +162,6 @@ export default function Chat() {
 
           {/* Input Area */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between space-x-2 mb-2">
-              <div className='flex items-center'><Switch
-                checked={isWebSearch}
-                onChange={() => setIsWebSearch(!isWebSearch)}
-                color="primary"
-                aria-label="Toggle between Web Search and Knowledge Base"
-              />
-                <label htmlFor="search-mode" className="text-sm w-fit font-medium">
-                  {isWebSearch ? 'Web Search' : 'Knowledge Base'}
-                </label>
-                {!isWebSearch && (
-                  <Select
-                    placeholder="Select KB"
-                    value={selectedKnowledgeBase}
-                    onChange={(event) => setSelectedKnowledgeBase(event.target.value)}
-                    aria-label="Knowledge Base Selector"
-                    className='max-w-60'
-                  >
-                    <SelectItem key="math" value="math">
-                      Math KB
-                    </SelectItem>
-                    <SelectItem key="science" value="science">
-                      Science KB
-                    </SelectItem>
-                    <SelectItem key="history" value="history">
-                      History KB
-                    </SelectItem>
-                    <SelectItem key="new" value="new">
-                      <span className="flex items-center">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Create New KB
-                      </span>
-                    </SelectItem>
-                  </Select>
-                )}</div>
-
-              <Button isIconOnly variant="light">
-                <Upload />
-              </Button>
-            </div>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
