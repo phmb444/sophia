@@ -4,9 +4,12 @@ import { generateText, streamText, tool } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { v4 as uuidv4 } from "uuid";
 import {z} from 'zod';
-import { generateOptimizedQueries, generateExercises } from "../exercises/route";
-import { create } from "domain";
+import OpenAI from "openai";
 
+
+const openAI = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 const prisma = new PrismaClient();
 const JINA_URL = process.env.JINA_URL;
 const JINA_API_KEY = process.env.JINA_API_KEY;
@@ -222,4 +225,53 @@ function serializeParameters(
     tipos: params.tipos,
     webContent: params.webContent ? params.webContent : [],
   };
+}
+
+async function generateExercises(parameters: ExerciseParameters): Promise<any> {
+  const response = await openAI.chat.completions.create({
+    model: "gpt-4o-mini",
+    response_format: { type: "json_object" },
+    messages: [
+      {
+        role: "system",
+        content: "Você é um assistente de IA educacional projetado para gerar exercícios com base na entrada do usuário. Responda com um JSON contendo os exercícios solicitados, seguindo os parâmetros fornecidos. O parâmetro WebContent irá conter links de sites e seus respectivos conteúdos que devem conter exercícios sobre o tema. Utilize esse conteúdo para gerar os exercícios. Dê preferência para exercícios que estejam dentro do WebContent, e coloque juntamente do enunciado deles o seu link original. A resposta deve ser um JSON válido, sem quebras de linha ou outros caracteres especiais, e deve incluir um array chamado 'questions'. Cada item deste array deve conter os seguintes atributos: 'question': O texto da pergunta. 'type': O tipo de questão, que pode ser 'alternativa' ou 'dissertativa'. Se o tipo for 'alternativa', deve conter um objeto 'options' com as propriedades 'a', 'b', 'c', e 'd', cada uma com o texto da respectiva alternativa. O item também deve conter um 'correct_answer' com a letra da alternativa correta e uma 'explanation' explicando por que essa resposta está correta. Se o tipo for 'dissertativa', deve conter um 'answer' com a resposta por extenso. Caso o exercício tenha sua fonte como um dos sites do WebContent, coloque o link original do site na propriedade 'source' do exercício. Tome cuidado para não criar alternativas muito grandes que possam exceder 120 caracteres."
+      },
+      {
+        role: "user",
+        content: JSON.stringify(parameters),
+      },
+    ],
+    temperature: 1,
+    max_tokens: 16384,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+  });
+
+  return JSON.parse(response.choices[0].message?.content ?? "");
+}
+
+async function generateOptimizedQueries(parameters: ExerciseParameters): Promise<string[]> {
+  const query = await openAI.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      {
+        role: "system",
+        content: "Você é um otimizador de querys. Dado parâmetros, crie 3 querys otimizadas para pesquisas em um mecanismo de busca como Google a respeito do tema. Faça cada query buscar um assunto diferente dentro do mesmo tema. Faça-as serem curtas com no máximo 10 palavras. Responda em português brasileiro. Elas devem estar em um JSON com a propriedade querys que deve conter um array com apenas o texto das querys. Comece sempre com 'Exercícios sobre...' ou 'Questões sobre...' e coloque também o nível de escolaridade, por exemplo: 'Exercícios sobre matemática para ensino fundamental'."
+      },
+      {
+        role: "user",
+        content: JSON.stringify(parameters),
+      },
+    ],
+    response_format: { type: "json_object" },
+    temperature: 1,
+    max_tokens: 1024,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+  });
+
+  const querys = JSON.parse(query.choices[0].message.content ?? "");
+  return querys.querys.map((query: string) => query.replace(/ /g, "%20"));
 }
