@@ -18,7 +18,7 @@ export default function StudyItineraryPage(data: {data:any}) {
   }
 
   return (
-    <div className="min-h-screen md:w-[60vw] w-[90vw] rounded-2xl mb-4 bg-gray-100 roteiro">
+    <div className="min-h-[80vh] md:w-[60vw] w-[90vw] rounded-2xl mb-4 bg-gray-100 roteiro">
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="flex flex-col gap-6">
@@ -78,14 +78,6 @@ export default function StudyItineraryPage(data: {data:any}) {
                   <Button color="primary" variant='flat' className='w-full' onClick={() => navigator.clipboard.writeText(window.location.href)}>
                     <Share className="w-4 h-4 mr-2" />
                     Compartilhar Roteiro
-                  </Button>
-                  <Button color="default"  className='w-full' >
-                    <Download className="w-4 h-4 mr-2" />
-                    Baixar como PDF
-                  </Button>
-                  <Button color="default" className='w-full' >
-                    <Printer className="w-4 h-4 mr-2" />
-                    Imprimir roteiro
                   </Button>
                 </CardFooter>
               </Card>
