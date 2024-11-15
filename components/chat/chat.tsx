@@ -73,7 +73,7 @@ export default function Chat() {
       headers: { Token: storedToken },
     })
       .then(res => {
-        if (!res.ok) throw new Error('Failed to load chat history');
+        if (!res.ok) throw new Error('Erro ao carregar histórico de conversas');
         return res.json();
       })
       .then(data => {
@@ -173,7 +173,7 @@ export default function Chat() {
                 value={input}
                 onChange={handleInputChange}
                 disabled={isSubmitting}
-                placeholder="Type your message here..."
+                placeholder="Digite sua mensagem aqui..."
                 className="flex-1"
                 minRows={1}
                 size='lg'
@@ -212,7 +212,7 @@ export default function Chat() {
                 radius="full"
                 className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
               >
-                {isSubmitting ? '...' : 'Send'}
+                {isSubmitting ? '...' : 'Enviar'}
               </Button>
             </form>
           </div>

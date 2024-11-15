@@ -154,7 +154,7 @@ export default function RoteirosForm() {
                         placeholder="Digite os materiais de estudo preferidos"
                     />
                     <Button isLoading={loading} onClick={handleSubmit} className="btn-gradient mt-6">
-                        Gerar exercícios
+                        Gerar roteiro
                     </Button>
                     {error ? <p className="text-red-500">{error}</p> : ""}
                 </div>
