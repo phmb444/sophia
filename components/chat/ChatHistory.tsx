@@ -30,7 +30,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({
   return (
     <div className="w-full max-w-[82vw] md:w-64  bg-white rounded-3xl overflow-hidden dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-semibold">Chat History</h2>
+        <h2 className="text-lg font-semibold">Histórico</h2>
         <Button isIconOnly variant="light" onClick={() => setIsCollapsed(true)}>
           <img src="/arrows-in-line-horizontal.svg" alt="" />
         </Button>
