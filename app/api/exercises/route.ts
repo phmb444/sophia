@@ -30,7 +30,7 @@ type SerializableExerciseParameters = {
     : ExerciseParameters[K];
 };
 
-export function serializeParameters(params: ExerciseParameters): SerializableExerciseParameters {
+function serializeParameters(params: ExerciseParameters): SerializableExerciseParameters {
   return {
     ...params,
     tipos: params.tipos,
