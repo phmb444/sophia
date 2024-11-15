@@ -53,7 +53,7 @@ async function handleAuthentication(request: Request): Promise<string | Response
   return new Response("Token inválido", { status: 401 });
 }
 
-export async function generateOptimizedQueries(parameters: ExerciseParameters): Promise<string[]> {
+async function generateOptimizedQueries(parameters: ExerciseParameters): Promise<string[]> {
   const query = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
@@ -78,7 +78,7 @@ export async function generateOptimizedQueries(parameters: ExerciseParameters): 
   return querys.querys.map((query: string) => query.replace(/ /g, "%20"));
 }
 
-export async function fetchWebContent(query: string): Promise<any[]> {
+async function fetchWebContent(query: string): Promise<any[]> {
   try {
     const busca = `${JINA_URL}${query}`;
     console.log(busca);
@@ -100,7 +100,7 @@ export async function fetchWebContent(query: string): Promise<any[]> {
   }
 }
 
-export async function generateExercises(parameters: ExerciseParameters): Promise<any> {
+async function generateExercises(parameters: ExerciseParameters): Promise<any> {
   const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     response_format: { type: "json_object" },
@@ -124,7 +124,7 @@ export async function generateExercises(parameters: ExerciseParameters): Promise
   return JSON.parse(response.choices[0].message?.content ?? "");
 }
 
-export async function saveExercises(userId: string, parameters: ExerciseParameters, content: any): Promise<string> {
+async function saveExercises(userId: string, parameters: ExerciseParameters, content: any): Promise<string> {
   const uuid = uuidv4();
   const serializedParams = serializeParameters(parameters);
   const savedContent = await prisma.exercises.create({
@@ -203,7 +203,7 @@ export async function PUT(request: Request) {
   return new Response("Erro interno do servidor", { status: 500 });
 }
 
-export async function createAssistant(userId: string, tema: string) {
+async function createAssistant(userId: string, tema: string) {
   return await openai.beta.assistants.create({
     name: `${tema}_${userId}`,
     model: "gpt-4o-mini",
@@ -212,11 +212,11 @@ export async function createAssistant(userId: string, tema: string) {
   });
 }
 
-export async function createVectorStore(userId: string, tema: string) {
+async function createVectorStore(userId: string, tema: string) {
   return await openai.beta.vectorStores.create({ name: `${tema}_${userId}` });
 }
 
-export async function uploadFiles(vectorStoreId: string, files: File[]) {
+async function uploadFiles(vectorStoreId: string, files: File[]) {
   let fileBatch = await openai.beta.vectorStores.fileBatches.uploadAndPoll(vectorStoreId, { files });
   while (fileBatch.status !== "completed") {
     await new Promise((resolve) => setTimeout(resolve, 300));
@@ -224,20 +224,20 @@ export async function uploadFiles(vectorStoreId: string, files: File[]) {
   }
 }
 
-export async function updateAssistant(assistantId: string, vectorStoreId: string) {
+async function updateAssistant(assistantId: string, vectorStoreId: string) {
   return await openai.beta.assistants.update(assistantId, {
     tool_resources: { "file_search": { "vector_store_ids": [vectorStoreId] } }
   });
 }
 
-export async function sendMessageToThread(threadId: string, parameters: ExerciseParameters) {
+async function sendMessageToThread(threadId: string, parameters: ExerciseParameters) {
   await openai.beta.threads.messages.create(threadId, {
     role: "user",
     content: JSON.stringify(parameters),
   });
 }
 
-export async function createAndWaitForRun(threadId: string, assistantId: string) {
+async function createAndWaitForRun(threadId: string, assistantId: string) {
   const run = await openai.beta.threads.runs.create(threadId, { assistant_id: assistantId });
   let retrieveRun = await openai.beta.threads.runs.retrieve(run.thread_id, run.id);
   while (retrieveRun.status !== "completed") {
@@ -247,7 +247,7 @@ export async function createAndWaitForRun(threadId: string, assistantId: string)
   return retrieveRun;
 }
 
-export async function getCompletedRunContent(threadId: string) {
+async function getCompletedRunContent(threadId: string) {
   const messages = await openai.beta.threads.messages.list(threadId);
   const content = (messages as any).body.data[0].content[0].text.value;
   return JSON.parse(content);
