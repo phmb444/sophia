@@ -123,7 +123,7 @@ export default function Chat() {
   };
   return (
     <div className="flex h-[88vh] mt-[-3vh] rounded-3xl p-[1.5px] bg-gradient-to-r from-yellow-400/30 via-pink-500/30 to-purple-500/30">
-      <div className="flex flex-1 bg-gray-50 dark:bg-gray-900 rounded-3xl">
+      <div className="flex flex-1 bg-white dark:bg-gray-900 rounded-3xl">
         {/* Chat History Sidebar */}
         {isCollapsed ? (
           <p></p>
@@ -161,7 +161,7 @@ export default function Chat() {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="p-4 md:px-40 border-t border-gray-200 dark:border-gray-700">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
