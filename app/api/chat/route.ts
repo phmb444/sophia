@@ -3,7 +3,7 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { generateText, streamText, tool } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { v4 as uuidv4 } from "uuid";
-import {z} from 'zod';
+import { z } from "zod";
 import OpenAI from "openai";
 
 
@@ -21,10 +21,16 @@ async function authenticateUser(request: Request): Promise<string | Response> {
   if (!SECRET) return new Response("Erro interno do servidor", { status: 500 });
 
   const decoded = await verifyJWT(token, SECRET);
-  return typeof decoded === "object" ? decoded.id : new Response("Token inválido", { status: 401 });
+  return typeof decoded === "object"
+    ? decoded.id
+    : new Response("Token inválido", { status: 401 });
 }
 
-async function saveChatMessage(userId: string, chatId: string, messages: { role: string; content: string }[]): Promise<string> {
+async function saveChatMessage(
+  userId: string,
+  chatId: string,
+  messages: { role: string; content: string }[]
+): Promise<string> {
   if (!chatId) throw new Error("Chat ID is required");
 
   const title = await generateChatTitle(messages); // Function to generate chat title
@@ -55,12 +61,17 @@ async function saveChatMessage(userId: string, chatId: string, messages: { role:
   return chatId;
 }
 
-async function generateChatTitle(messages: { role: string; content: string }[]): Promise<string> {
+async function generateChatTitle(
+  messages: { role: string; content: string }[]
+): Promise<string> {
   const model = openai("gpt-4o-mini");
-  const {text} = await generateText({
-    system: "dado um conjunto de mensagens, gerar um título curto para o chat, nao utilize de markdown nem de '' ou `` para começar e terminar o texto, apenas o texto com pontuação normal, também não coloque sophia no titulo dos textos gerados, coloque apenas sobre o que se trata a conversa",
+  const { text } = await generateText({
+    system:
+      "dado um conjunto de mensagens, gerar um título curto para o chat, nao utilize de markdown nem de '' ou `` para começar e terminar o texto, apenas o texto com pontuação normal, também não coloque sophia no titulo dos textos gerados, coloque apenas sobre o que se trata a conversa",
     model,
-    prompt: messages.map((m) => `${m.role === "user" ? "Você" : "Sophia"}: ${m.content}`).join("\n"),
+    prompt: messages
+      .map((m) => `${m.role === "user" ? "Você" : "Sophia"}: ${m.content}`)
+      .join("\n"),
   });
   return text;
 }
@@ -74,7 +85,11 @@ async function handleChatPost(req: Request) {
   const model = openai("gpt-4o-mini");
 
   const result = await streamText({
-    system: `Você é Sophia, uma assistente educacional interativa e altamente personalizada, desenvolvida para ajudar os usuários a aprender de maneira eficiente e engajante. Siga estas diretrizes fundamentais:
+    system: `Quando for escrever qualquer número ou fórumla SEMPRE utilize KaTeX envolvendo o numero ou expressão matemática em cifroes duplos como a seguir $$x^2$$.
+
+    Você deve sempre responder em markdown e pode utilizar links de imagens obtidos atráves da ferramenta de web search para mostrar imagens utilizando markdown.
+     
+    Você é Sophia, uma assistente educacional interativa e altamente personalizada, desenvolvida para ajudar os usuários a aprender de maneira eficiente e engajante. Siga estas diretrizes fundamentais:
 
 Estimule o Pensamento Ativo: Incentive os usuários a refletirem, questionarem e explorarem ideias, em vez de oferecer respostas diretas sempre que possível.
 
@@ -104,11 +119,14 @@ Crie atividades interativas em pequenas quantidades inicialmente (ex.: 5 exercí
 Ofereça links para materiais complementares usando ferramentas disponíveis.
 Pergunte ao usuário se ele se sente pronto para avançar ou precisa de mais explicações antes de prosseguir.
 Conclua cada etapa de aprendizado com uma recapitulação e incentivo para o próximo desafio. Respire fundo e aborde cada problema passo a passo.
+
+LEMBRE SE DE SEMPRE Quando for escrever qualquer número, fórmula ou uma expressão simples como q = 1 ou x SEMPRE utilize KaTeX envolvendo o numero ou expressão matemática em cifroes duplos como a seguir $$x^2$$.
+   
 `,
     model,
     messages,
     maxTokens: 4096,
-    maxSteps: 5,  
+    maxSteps: 10,
     temperature: 0.7,
     async onFinish({ text }) {
       messages.push({ role: "assistant", content: text });
@@ -116,27 +134,36 @@ Conclua cada etapa de aprendizado com uma recapitulação e incentivo para o pr�
     },
     tools: {
       webSearch: tool({
-        description: "Buscar conteúdo na web, utilize essa ferramenta para buscar conteúdo na web para complementar suas respostas, não é necessário pedir permissão do usuário para isto, no final de toda resposta referêncie os links que foram retornados pela busca.", 
+        description:
+          "Buscar conteúdo na web, utilize essa ferramenta para buscar conteúdo na web para complementar suas respostas, não é necessário pedir permissão do usuário para isto, no final de toda resposta referêncie os links que foram retornados pela busca. Utilize SEMPRE que possível essa ferramenta para buscar conteúdo na web, mesmo que o usuário não tenha pedido, pois isso enriquece a experiência do usuário. Quando for procurar por uma imagem pesquise só o nome da coisa pesquisa só cachorro e não imagem de um cachorro",
         parameters: z.object({
-          query:  z.string().describe('Query para busca na web')
-      }),
+          query: z.string().describe("Query para busca na web"),
+        }),
         execute: async ({ query }) => fetchWebContent(query),
-        
       }),
       createExercises: tool({
-        description: "Gerar uma lista de exercicios para o usuário com base nos parametros fornecidos, antes de chamar essa ferramenta, pergunte ao usuário mais informações sobre o que ele deseja, como tema, quantidade, nível e tipos de exercícios, após isso, chame essa ferramenta com os parametros fornecidos, a resposta da ferramenta será um link para a página dos exercícios gerados",
+        description:
+          "Gerar uma lista de exercicios para o usuário com base nos parametros fornecidos, antes de chamar essa ferramenta, pergunte ao usuário mais informações sobre o que ele deseja, como tema, quantidade, nível e tipos de exercícios, após isso, chame essa ferramenta com os parametros fornecidos, a resposta da ferramenta será um link para umaa página com os exercicios gerados onde o usuário pode responder os exercicios e ver as respostas corretas, tanto de questôes alternativas quanto dissertativas, sempre use essa feramenta para gerar exercicios, no tema dos exercicios você pode ser mais especifico como exercicios de programação onde o usuário recebe um enunciado e deve escrever um código que resolva o problema, ou exercicios de matemática onde o usuário recebe um enunciado e deve responder com um número. Sempre especifique o tema por exemplo matrizes e vetores podem ser para matemática ou programação, dependendo do contexto.",
         parameters: z.object({
-          tema: z.string().describe('Tema dos exercícios'),
-          quantidade: z.string().describe('Quantidade de exercícios'),
-          nivel: z.string().describe('Nível dos exercícios (pode ser por dificuldade ou série)'),
-          tipos: z.array(z.string()).describe('Tipos de exercícios, só podem ser "Alternativas" ou "Dissertativas"')
+          tema: z.string().describe("Tema dos exercícios"),
+          quantidade: z.string().describe("Quantidade de exercícios"),
+          nivel: z
+            .string()
+            .describe(
+              "Nível dos exercícios (pode ser por dificuldade ou série)"
+            ),
+          tipos: z
+            .array(z.string())
+            .describe(
+              'Tipos de exercícios, só podem ser "Alternativas" ou "Dissertativas"'
+            ),
         }),
         execute: async (params) => {
           const exerciseId = await generateAndSaveExercises(params);
           return `https://aprendacomsophia.com/exercises/${exerciseId}`;
-        }
-      })
-    }
+        },
+      }),
+    },
   });
 
   return result.toDataStreamResponse();
@@ -157,7 +184,10 @@ async function handleChatGet(req: Request) {
     });
 
     if (!chat) return new Response("Chat not found", { status: 404 });
-    return new Response(JSON.stringify({ messages: chat.content, title: chat.title }), { headers: { "Content-Type": "application/json" } });
+    return new Response(
+      JSON.stringify({ messages: chat.content, title: chat.title }),
+      { headers: { "Content-Type": "application/json" } }
+    );
   }
 
   const chats = await prisma.chat.findMany({
@@ -171,7 +201,9 @@ async function handleChatGet(req: Request) {
     title: chat.title,
   }));
 
-  return new Response(JSON.stringify(chatSummaries), { headers: { "Content-Type": "application/json" } });
+  return new Response(JSON.stringify(chatSummaries), {
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 export async function POST(req: Request) {
@@ -194,6 +226,7 @@ async function fetchWebContent(query: string): Promise<any[]> {
         Authorization: `Bearer ${JINA_API_KEY}`,
         Accept: "application/json",
         "X-Locale": "pt-BR",
+        "X-With-Generated-Alt": "true"
       },
     });
 
@@ -204,6 +237,7 @@ async function fetchWebContent(query: string): Promise<any[]> {
     return [];
   }
 }
+
 
 interface ExerciseParameters {
   tema: string;
@@ -264,7 +298,8 @@ async function generateExercises(parameters: ExerciseParameters): Promise<any> {
     messages: [
       {
         role: "system",
-        content: "Você é um assistente de IA educacional projetado para gerar exercícios com base na entrada do usuário. Responda com um JSON contendo os exercícios solicitados, seguindo os parâmetros fornecidos. O parâmetro WebContent irá conter links de sites e seus respectivos conteúdos que devem conter exercícios sobre o tema. Utilize esse conteúdo para gerar os exercícios. Dê preferência para exercícios que estejam dentro do WebContent, e coloque juntamente do enunciado deles o seu link original. A resposta deve ser um JSON válido, sem quebras de linha ou outros caracteres especiais, e deve incluir um array chamado 'questions'. Cada item deste array deve conter os seguintes atributos: 'question': O texto da pergunta. 'type': O tipo de questão, que pode ser 'alternativa' ou 'dissertativa'. Se o tipo for 'alternativa', deve conter um objeto 'options' com as propriedades 'a', 'b', 'c', e 'd', cada uma com o texto da respectiva alternativa. O item também deve conter um 'correct_answer' com a letra da alternativa correta e uma 'explanation' explicando por que essa resposta está correta. Se o tipo for 'dissertativa', deve conter um 'answer' com a resposta por extenso. Caso o exercício tenha sua fonte como um dos sites do WebContent, coloque o link original do site na propriedade 'source' do exercício. Tome cuidado para não criar alternativas muito grandes que possam exceder 120 caracteres."
+        content:
+          "Você é um assistente de IA educacional projetado para gerar exercícios com base na entrada do usuário. Responda com um JSON contendo os exercícios solicitados, seguindo os parâmetros fornecidos. O parâmetro WebContent irá conter links de sites e seus respectivos conteúdos que devem conter exercícios sobre o tema. Utilize esse conteúdo para gerar os exercícios. Dê preferência para exercícios que estejam dentro do WebContent, e coloque juntamente do enunciado deles o seu link original. A resposta deve ser um JSON válido, sem quebras de linha ou outros caracteres especiais, e deve incluir um array chamado 'questions'. Cada item deste array deve conter os seguintes atributos: 'question': O texto da pergunta. 'type': O tipo de questão, que pode ser 'alternativa' ou 'dissertativa'. Se o tipo for 'alternativa', deve conter um objeto 'options' com as propriedades 'a', 'b', 'c', e 'd', cada uma com o texto da respectiva alternativa. O item também deve conter um 'correct_answer' com a letra da alternativa correta e uma 'explanation' explicando por que essa resposta está correta. Se o tipo for 'dissertativa', deve conter um 'answer' com a resposta por extenso. Caso o exercício tenha sua fonte como um dos sites do WebContent, coloque o link original do site na propriedade 'source' do exercício. Tome cuidado para não criar alternativas muito grandes que possam exceder 120 caracteres.",
       },
       {
         role: "user",
@@ -281,13 +316,16 @@ async function generateExercises(parameters: ExerciseParameters): Promise<any> {
   return JSON.parse(response.choices[0].message?.content ?? "");
 }
 
-async function generateOptimizedQueries(parameters: ExerciseParameters): Promise<string[]> {
+async function generateOptimizedQueries(
+  parameters: ExerciseParameters
+): Promise<string[]> {
   const query = await openAI.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
       {
         role: "system",
-        content: "Você é um otimizador de querys. Dado parâmetros, crie 3 querys otimizadas para pesquisas em um mecanismo de busca como Google a respeito do tema. Faça cada query buscar um assunto diferente dentro do mesmo tema. Faça-as serem curtas com no máximo 10 palavras. Responda em português brasileiro. Elas devem estar em um JSON com a propriedade querys que deve conter um array com apenas o texto das querys. Comece sempre com 'Exercícios sobre...' ou 'Questões sobre...' e coloque também o nível de escolaridade, por exemplo: 'Exercícios sobre matemática para ensino fundamental'."
+        content:
+          "Você é um otimizador de querys. Dado parâmetros, crie 3 querys otimizadas para pesquisas em um mecanismo de busca como Google a respeito do tema. Faça cada query buscar um assunto diferente dentro do mesmo tema. Faça-as serem curtas com no máximo 10 palavras. Responda em português brasileiro. Elas devem estar em um JSON com a propriedade querys que deve conter um array com apenas o texto das querys. Comece sempre com 'Exercícios sobre...' ou 'Questões sobre...' e coloque também o nível de escolaridade, por exemplo: 'Exercícios sobre matemática para ensino fundamental'.",
       },
       {
         role: "user",

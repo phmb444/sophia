@@ -123,7 +123,7 @@ export default function Chat() {
   };
   return (
     <div className="flex h-[88vh] mt-[-3vh] rounded-3xl p-[1.5px] bg-gradient-to-r from-yellow-400/30 via-pink-500/30 to-purple-500/30">
-      <div className="flex flex-1 bg-white dark:bg-gray-900 rounded-3xl">
+      <div className="flex flex-1 bg-white dark:bg-gray-900 rounded-3xl overflow-hidden">
         {/* Chat History Sidebar */}
         {isCollapsed ? (
           <p></p>
@@ -140,7 +140,7 @@ export default function Chat() {
         )}
 
         {/* Main Chat Area */}
-        <div className={"flex-1 flex flex-col" + (!isCollapsed ? " hidden md:flex" : "")}>
+        <div className={"flex-1 flex flex-col overflow-hidden" + (!isCollapsed ? " hidden md:flex" : "")}>
           <div className='flex px-2 md:px-4 items-center'>
             {isCollapsed ? (<div className="p-2">
               <Button isIconOnly variant="light" onClick={() => setIsCollapsed(false)}>
@@ -155,7 +155,7 @@ export default function Chat() {
           {/* Chat Messages */}
           <div
             ref={messagesContainerRef}
-            className="flex-1 p-4 overflow-y-auto"
+            className="flex-1 p-4 overflow-y-auto overflow-x-hidden"
           >
             <MessageList key={selectedChatId} messages={messages} isLoadingMessages={isLoadingMessages} />
           </div>
@@ -212,7 +212,7 @@ export default function Chat() {
                 radius="full"
                 className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
               >
-                {isSubmitting ? '...' : 'Enviar'}
+                {isSubmitting ? '' : 'Enviar'}
               </Button>
             </form>
           </div>

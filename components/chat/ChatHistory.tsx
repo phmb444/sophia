@@ -36,7 +36,16 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({
         </Button>
       </div>
       <div className="pt-4 px-2 space-y-2 h-[calc(100vh-60px)]">
-        <Button color="secondary" onClick={onNewChat} className="bg-gradient-to-r w-full max-w-[82vw] from-purple-600 to-pink-500 text-white shadow-lg ">
+        <Button
+          color="secondary"
+          onClick={() => {
+            onNewChat();
+            if (window.innerWidth < 768) {
+              setIsCollapsed(true);
+            }
+          }}
+          className="bg-gradient-to-r w-full max-w-[82vw] from-purple-600 to-pink-500 text-white shadow-lg "
+        >
           Novo chat
         </Button>
         {chatHistory.length === 0 ? (
@@ -50,8 +59,8 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({
                 key={chat.id}
                 onClick={() => onChatSelect(chat.id)}
                 className={`mx-2 box-border p-2 cursor-pointer my-2 ${chat.id === selectedChatId
-                    ? 'bg-gray-200 dark:bg-gray-700'
-                    : 'bg-white dark:bg-gray-800'
+                  ? 'bg-gray-200 dark:bg-gray-700'
+                  : 'bg-white dark:bg-gray-800'
                   } border-1 rounded-xl truncate ... border-gray-300 dark:border-gray-600 text-xs font-medium`}
               >
                 {chat.title}

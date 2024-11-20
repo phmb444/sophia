@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/chat/CustomMarkdownComponents.jsx", "components/chat/MessageList.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/chat/CustomMarkdownComponents.jsx", "components/chat/MessageList.jsx", "components/exercicios/QuestaoAlternativa.tsx"],
   "exclude": ["node_modules"]
 }

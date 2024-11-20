@@ -2,6 +2,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { ScrollShadow } from '@nextui-org/react';
 import remarkGfm from 'remark-gfm';
+import { motion } from 'framer-motion';
 import {
   CustomTable,
   CustomTableHead,
@@ -11,24 +12,37 @@ import {
   CustomHeading,
   CustomLink,
 } from './CustomMarkdownComponents';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 const MessageList = ({ messages, isLoadingMessages }) => {
   const filteredMessages = messages.filter(m => m.content.trim() !== '');
 
+  // Define variants for the animation
+  const messageVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
-    <ScrollShadow className="flex-1 overflow-y-auto p-4 md:px-40">
+    <ScrollShadow className="flex-1 overflow-y-auto p-4 md:px-40 scrollbar-hide">
       {isLoadingMessages ? (
         <div className="text-center p-4">Carregando mensagens...</div>
       ) : (
         <ul className="space-y-4 flex flex-col">
           {filteredMessages.map((m, index) => (
-            <li
+            <motion.li
               key={index}
-              className={`p-3 rounded-xl max-w-4/5 min-w-60 ${
+              className={`p-3 rounded-xl max-w-full md:max-w-[80%] ${
                 m.role === 'user'
-                  ? 'bg-gray-200 self-end flex flex-col w-fit shadow-md'
-                  : ' self-start'
+                  ? 'bg-gray-200 self-end flex flex-col w-full md:w-fit shadow-md'
+                  : 'self-start w-full'
               }`}
+              initial="hidden"
+              animate="visible"
+              variants={messageVariants}
+              transition={{ duration: 0.8, ease: 'easeInOut' }}
             >
               {m.role === 'user' ? (
                 <p className="font-bold text-black">Você</p>
@@ -38,7 +52,8 @@ const MessageList = ({ messages, isLoadingMessages }) => {
                 </p>
               )}
               <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
+                remarkPlugins={[remarkGfm, remarkMath]}
+                rehypePlugins={[rehypeKatex]}
                 components={{
                   table: CustomTable,
                   thead: CustomTableHead,
@@ -55,11 +70,11 @@ const MessageList = ({ messages, isLoadingMessages }) => {
                   h6: (props) => <CustomHeading {...props} level={6} />,
                   a: CustomLink,
                 }}
-                className="text-sm p-2"
+                className="text-sm p-2 break-words"
               >
                 {m.content}
               </ReactMarkdown>
-            </li>
+            </motion.li>
           ))}
         </ul>
       )}

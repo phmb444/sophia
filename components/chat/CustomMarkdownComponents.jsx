@@ -1,8 +1,8 @@
 import React from 'react';
 
 const CustomTable = ({ children }) => (
-  <div className="overflow-x-auto border-zinc-500 border-1 mt-4 mb-4 rounded-2xl">
-    <table className="min-w-full">
+  <div className="overflow-x-auto border-zinc-500 border mt-4 mb-4 rounded-2xl">
+    <table className="table-auto w-full">
       {children}
     </table>
   </div>
@@ -66,7 +66,7 @@ const CustomHeading = ({ level, children }) => {
 };
 
 const CustomLink = ({ href, children }) => (
-  <a href={href} className="text-blue-500 hover:underline">
+  <a href={href} target='_blank' className="text-blue-500 hover:underline">
     {children}
   </a>
 );
